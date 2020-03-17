@@ -1,13 +1,11 @@
 package com.ak.cardstore.pojo;
 
-import java.util.Set;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
- * A POJO to represent a wallet with {@link Card}s
+ * Represents an encrypted wallet.
  *
  * @author Abhishek
  */
@@ -15,7 +13,9 @@ import lombok.Getter;
 @Getter
 @Builder
 @EqualsAndHashCode
-public class Wallet {
+public class EncryptedWallet {
 
-    private final Set<Card> cards;
+    final String serializedAndEncryptedWallet;
+
+    final String initialVector;
 }

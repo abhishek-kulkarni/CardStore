@@ -5,11 +5,10 @@ import com.ak.cardstore.entities.MonthYear;
 import com.ak.cardstore.exception.CardValidationException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.time.Month;
-import java.time.ZonedDateTime;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Abhishek
@@ -20,21 +19,21 @@ public class CardValidatorTest {
     @Test
     public void testValidateCardNumber_WithNonNumericCardNumber() {
         final CardValidator cardValidator = new CardValidator();
-        final String cardNumber = Make.aString();
+        final String cardNumber = Make.aNonNumericCardNumber();
 
-        Assertions.assertThrows(CardValidationException.class,
-                () -> cardValidator.validateCardNumber(cardNumber),
-                "Card number " + cardNumber + " must not contain non-numberic characters!");
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validateCardNumber(cardNumber));
+        assertEquals("Card number " + cardNumber + " must not contain non-numberic characters!", cardValidationException.getMessage());
     }
 
     @Test
     public void testValidateCardNumber_WithInvalidCardNumberLength() {
         final CardValidator cardValidator = new CardValidator();
-        final String cardNumber = Make.anInvalidCardNumber();
+        final String cardNumber = Make.aCardNumberWithInvalidLength();
 
-        Assertions.assertThrows(CardValidationException.class,
-                () -> cardValidator.validateCardNumber(cardNumber),
-                "Card number " + cardNumber + " must be of 16 digits!");
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validateCardNumber(cardNumber));
+        assertEquals("Card number " + cardNumber + " must be of 16 digits!", cardValidationException.getMessage());
     }
 
     @Test
@@ -48,9 +47,9 @@ public class CardValidatorTest {
     public void testValidateNameOnCard_WithEmptyName() {
         final CardValidator cardValidator = new CardValidator();
 
-        Assertions.assertThrows(CardValidationException.class,
-                () -> cardValidator.validateNameOnCard(StringUtils.EMPTY),
-                "Name on card cannot be empty!");
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validateNameOnCard(StringUtils.EMPTY));
+        assertEquals("Name on card cannot be empty!", cardValidationException.getMessage());
     }
 
     @Test
@@ -61,30 +60,80 @@ public class CardValidatorTest {
     }
 
     @Test
-    public void testValidateExpiryDate_WithCurrentMonthAndYear() {
+    public void testValidateExpiryDate_WithValidExpiryDate() {
         final CardValidator cardValidator = new CardValidator();
 
-        final ZonedDateTime currentDate = ZonedDateTime.now();
-
-        cardValidator.validateExpiryDate(MonthYear.of(currentDate.getMonth(), currentDate.getYear()));
-    }
-
-    @Test
-    public void testValidateExpiryDate_WithFutureMonthAndYear() {
-        final CardValidator cardValidator = new CardValidator();
-
-        final ZonedDateTime currentDate = ZonedDateTime.now().plusDays(590);
-
-        cardValidator.validateExpiryDate(MonthYear.of(currentDate.getMonth(), currentDate.getYear()));
+        cardValidator.validateExpiryDate(Make.aValidExpiryDate());
     }
 
     @Test
     public void testValidateExpiryDate_WithPastMonthAndYear() {
         final CardValidator cardValidator = new CardValidator();
-        final ZonedDateTime currentDate = ZonedDateTime.now().minusMonths(1);
+        final MonthYear expiryDate = Make.anExpiryDateInThePast();
 
-        Assertions.assertThrows(CardValidationException.class,
-                () -> cardValidator.validateExpiryDate(MonthYear.of(Month.JANUARY, currentDate.getYear())),
-                "Card expiry date cannot be in the past!");
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validateExpiryDate(expiryDate));
+        assertEquals("Card expiry date cannot be in the past!", cardValidationException.getMessage());
+    }
+
+    @Test
+    public void testValidateCVV_WithNonNumericCVV() {
+        final CardValidator cardValidator = new CardValidator();
+        final String cvv = Make.aNonNumericCVV();
+
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validateCVV(cvv));
+        assertEquals("CVV " + cvv + " must not contain non-numberic characters!", cardValidationException.getMessage());
+    }
+
+    @Test
+    public void testValidateCVV_WithInvalidCVVLength() {
+        final CardValidator cardValidator = new CardValidator();
+        final String cvv = Make.aCVVWithInvalidCVVLength();
+
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validateCVV(cvv));
+        assertEquals("CVV " + cvv + " must be of 3 or 4 digits!", cardValidationException.getMessage());
+    }
+
+    @Test
+    public void testValidateCVV_WithValidCVV() {
+        final CardValidator cardValidator = new CardValidator();
+
+        cardValidator.validateCVV(Make.aValidCVV());
+    }
+
+    @Test
+    public void testValidatePin_WithNullPin() {
+        final CardValidator cardValidator = new CardValidator();
+
+        cardValidator.validatePin(null);
+    }
+
+    @Test
+    public void testValidatePin_WithInvalidPinLength() {
+        final CardValidator cardValidator = new CardValidator();
+        final String pin = Make.aPinWithInvalidLength();
+
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validatePin(pin));
+        assertEquals("Pin " + pin + " must be between 4 and 6 digits!", cardValidationException.getMessage());
+    }
+
+    @Test
+    public void testValidatePin_WithNonNumericPin() {
+        final CardValidator cardValidator = new CardValidator();
+        final String pin = Make.aNonNumericPin();
+
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validatePin(pin));
+        assertEquals("Pin " + pin + " must not contain non-numberic characters!", cardValidationException.getMessage());
+    }
+
+    @Test
+    public void testValidatePin_WithValidPin() {
+        final CardValidator cardValidator = new CardValidator();
+
+        cardValidator.validatePin(Make.aValidPin());
     }
 }

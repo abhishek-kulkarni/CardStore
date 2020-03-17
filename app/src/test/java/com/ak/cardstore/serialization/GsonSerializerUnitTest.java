@@ -2,21 +2,23 @@ package com.ak.cardstore.serialization;
 
 import com.ak.cardstore.pojo.Wallet;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Abhishek
  */
 
-public class GsonSerializerTest {
+public class GsonSerializerUnitTest {
 
     @Test
     public void testSerialize_WithNull() {
         final Serializer<Wallet> walletSerializer = new GsonSerializer<>(Wallet.class);
 
         final String serializedWallet = walletSerializer.serialize(null);
-        Assertions.assertNull(serializedWallet);
+        assertNull(serializedWallet);
     }
 
     @Test
@@ -24,7 +26,7 @@ public class GsonSerializerTest {
         final Serializer<Wallet> walletSerializer = new GsonSerializer<>(Wallet.class);
 
         final Wallet wallet = walletSerializer.deserialize(null);
-        Assertions.assertNull(wallet);
+        assertNull(wallet);
     }
 
     @Test
@@ -34,7 +36,7 @@ public class GsonSerializerTest {
         final Wallet testWallet = Wallet.builder()
                 .build();
 
-        final Wallet wallet = walletSerializer.deserialize(null);
-        Assertions.assertNull(wallet);
+        final Wallet wallet = walletSerializer.deserialize(walletSerializer.serialize(testWallet));
+        assertEquals(testWallet, wallet);
     }
 }

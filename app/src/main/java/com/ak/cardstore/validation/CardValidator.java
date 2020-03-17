@@ -19,9 +19,10 @@ import lombok.NonNull;
 public class CardValidator {
 
     private static final int CARD_NUMBER_LENGTH = 16;
-    private static final int CVV_LENGTH = 3;
+    private static final int CVV_LENGTH_3 = 3;
+    private static final int CVV_LENGTH_4 = 4;
     private static final int PIN_LENGTH_LOWER_BOUND = 4;
-    private static final int PIN_LENGTH_UPPER_BOUND = 4;
+    private static final int PIN_LENGTH_UPPER_BOUND = 6;
 
     /**
      * Validates the card number to be a 16 digit number
@@ -30,11 +31,11 @@ public class CardValidator {
      */
     public void validateCardNumber(@NonNull final String cardNumber) {
         if (cardNumber.length() != CARD_NUMBER_LENGTH) {
-            throw new CardValidationException(String.format("Card number {} must be of {} digits!", cardNumber, CARD_NUMBER_LENGTH));
+            throw new CardValidationException(String.format("Card number %s must be of %s digits!", cardNumber, CARD_NUMBER_LENGTH));
         }
 
         if (!StringUtils.isNumeric(cardNumber)) {
-            throw new CardValidationException(String.format("Card number {} must not contain non-numberic characters!", cardNumber));
+            throw new CardValidationException(String.format("Card number %s must not contain non-numberic characters!", cardNumber));
         }
     }
 
@@ -68,12 +69,13 @@ public class CardValidator {
      * @param cvv card CVV
      */
     public void validateCVV(@NonNull final String cvv) {
-        if (cvv.length() != CVV_LENGTH) {
-            throw new CardValidationException(String.format("CVV {} must be of {} digits!", cvv, CVV_LENGTH));
+        final int cvvLength = cvv.length();
+        if (cvvLength != CVV_LENGTH_3 && cvvLength != CVV_LENGTH_4) {
+            throw new CardValidationException(String.format("CVV %s must be of %s or %s digits!", cvv, CVV_LENGTH_3, CVV_LENGTH_4));
         }
 
         if (!StringUtils.isNumeric(cvv)) {
-            throw new CardValidationException(String.format("CVV {} must not contain non-numberic characters!", cvv));
+            throw new CardValidationException(String.format("CVV %s must not contain non-numberic characters!", cvv));
         }
     }
 
@@ -89,12 +91,12 @@ public class CardValidator {
 
         final int pinLength = pin.length();
         if (pinLength < PIN_LENGTH_LOWER_BOUND || pinLength > PIN_LENGTH_UPPER_BOUND) {
-            throw new CardValidationException(String.format("Pin {} must be between {} and {} digits!", pin, PIN_LENGTH_LOWER_BOUND,
+            throw new CardValidationException(String.format("Pin %s must be between %s and %s digits!", pin, PIN_LENGTH_LOWER_BOUND,
                     PIN_LENGTH_UPPER_BOUND));
         }
 
         if (!StringUtils.isNumeric(pin)) {
-            throw new CardValidationException(String.format("Pin {} must not contain non-numberic characters!", pin));
+            throw new CardValidationException(String.format("Pin %s must not contain non-numberic characters!", pin));
         }
     }
 }

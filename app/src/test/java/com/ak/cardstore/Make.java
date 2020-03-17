@@ -7,9 +7,8 @@ import com.ak.cardstore.pojo.Card;
 import com.ak.cardstore.pojo.Wallet;
 import com.google.common.collect.ImmutableSet;
 
-import java.time.Month;
 import java.time.Year;
-import java.util.Set;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -22,6 +21,15 @@ public final class Make {
      */
     public static String aString() {
         return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Returns a pseudorandom {@code boolean} value.
+     *
+     * @return a pseudorandom {@code boolean} value
+     */
+    public static boolean aBoolean() {
+        return ThreadLocalRandom.current().nextBoolean();
     }
 
     /**
@@ -52,24 +60,26 @@ public final class Make {
      * @return a test {@link Wallet} with dummy data
      */
     public static Wallet aWallet() {
-        final Set<Card> cards = ImmutableSet.of(Card.builder()
+        return Wallet.builder()
+                .cards(ImmutableSet.of(aCard()))
+                .build();
+    }
+
+    /**
+     * Return a test {@link Card}.
+     *
+     * @return a test {@link Card}.
+     */
+    public static Card aCard() {
+        return Card.builder()
                 .cardProcessor(getRandomElement(CardProcessor.values()))
                 .cardType(getRandomElement(CardType.values()))
-                .cvv(aCVV())
-                .expiryDate(MonthYear.builder()
-                        .month(getRandomElement(Month.values()))
-                        .year(aYear())
-                        .build())
+                .cvv(aValidCVV())
+                .expiryDate(aValidExpiryDate())
                 .nameOnCard(aString())
                 .number(aValidCardNumber())
-                .pin(aPin())
-                .build());
-
-        final Wallet testWallet = Wallet.builder()
-                .cards(cards)
+                .pin(aValidPin())
                 .build();
-
-        return testWallet;
     }
 
     /**
@@ -87,9 +97,24 @@ public final class Make {
      *
      * @return a card number with invalid number of digits
      */
-    public static String anInvalidCardNumber() {
-        // Any 16 digit string
+    public static String aCardNumberWithInvalidLength() {
+        if (aBoolean()) {
+            // Any 17+ digit string
+            return "12345678987654321";
+        }
+
+        // Any string with 15 or less digits
         return "123456787654321";
+    }
+
+    /**
+     * Returns a card number with non-numeric characters
+     *
+     * @return a card number with non-numeric characters
+     */
+    public static String aNonNumericCardNumber() {
+        // Any non 16 digit string
+        return "12345678a7654321";
     }
 
     /**
@@ -97,9 +122,38 @@ public final class Make {
      *
      * @return a 3 digit CVV
      */
-    public static String aCVV() {
-        // Any 3 digit string
-        return String.valueOf(anInt(100, 1000));
+    public static String aValidCVV() {
+        // Any 3 or 4 digit number
+        return String.valueOf(anInt(100, 10000));
+    }
+
+    /**
+     * Returns a CVV with non-3 digit number
+     *
+     * @return a CVV with non-3 digit number
+     */
+    public static String aCVVWithInvalidCVVLength() {
+        // Any non 3 digit number
+        if (aBoolean()) {
+            return String.valueOf(anInt(0, 100));
+        }
+
+        return String.valueOf(anInt(10000, 100000));
+    }
+
+    /**
+     * Returns a CVV with non-numeric characters
+     *
+     * @return a CVV with non-numeric characters
+     */
+    public static String aNonNumericCVV() {
+        if (aBoolean()) {
+            // Any non-numeric 3 digit string
+            return "1a2";
+        }
+
+        // Any non-numeric 4 digit string
+        return "123a";
     }
 
     /**
@@ -107,9 +161,70 @@ public final class Make {
      *
      * @return a 4 to 6 digit pin
      */
-    public static String aPin() {
+    public static String aValidPin() {
         // Any 4 to 6 digit string
         return String.valueOf(anInt(1000, 1000000));
+    }
+
+    /**
+     * Returns a pin with length less than 4 or greater than 6
+     *
+     * @return a pin with length less than 4 or greater than 6
+     */
+    public static String aPinWithInvalidLength() {
+        if (aBoolean()) {
+            // Any string with 3 or less digits
+            return String.valueOf(anInt(0, 1000));
+        }
+
+        // Any string with 7 or more digits
+        return String.valueOf(anInt(1000000, 10000000));
+    }
+
+    /**
+     * Returns a pin with non-numeric characters
+     *
+     * @return a pin with non-numeric characters
+     */
+    public static String aNonNumericPin() {
+        if (aBoolean()) {
+            // Any 4 digit string with non-numeric characters
+            return "123a";
+        }
+
+        if (aBoolean()) {
+            // Any 5 digit string with non-numeric characters
+            return "1234a";
+        }
+
+        // Any 6 digit string with non-numeric characters
+        return "12345a";
+    }
+
+    /**
+     * Returns an expiry date with current or future {@link MonthYear}.
+     *
+     * @return an expiry date with current or future {@link MonthYear}.
+     */
+    public static MonthYear aValidExpiryDate() {
+        final ZonedDateTime zonedDateTime;
+        if (aBoolean()) {
+            zonedDateTime = ZonedDateTime.now().plusDays(590);
+        } else {
+            zonedDateTime = ZonedDateTime.now();
+        }
+
+        return MonthYear.of(zonedDateTime.getMonth(), zonedDateTime.getYear());
+    }
+
+    /**
+     * Returns an expiry date in the past.
+     *
+     * @return an expiry date in the past
+     */
+    public static MonthYear anExpiryDateInThePast() {
+        final ZonedDateTime zonedDateTime = ZonedDateTime.now().minusMonths(1);
+        return MonthYear.of(zonedDateTime.getMonth(), zonedDateTime.getYear());
     }
 
     private static <ARRAY_ELEMENT_TYPE> ARRAY_ELEMENT_TYPE getRandomElement(final ARRAY_ELEMENT_TYPE[] array) {
