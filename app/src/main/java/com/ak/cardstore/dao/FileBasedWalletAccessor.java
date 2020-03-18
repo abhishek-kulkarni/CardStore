@@ -19,10 +19,22 @@ public class FileBasedWalletAccessor implements WalletAccessor {
 
     @Override
     public void save(final Wallet wallet) {
+        // Serialize the wallet
+
+        // encrypt the wallet
+
+        // write the encrypted wallet
     }
 
     @Override
     public Wallet retrieve() {
+        // Read the encrypted wallet
+
+        // decrypt the Wallet
+
+        // Deserialize the decrypted wallet
+
+        // return the wallet
         return null;
     }
 }

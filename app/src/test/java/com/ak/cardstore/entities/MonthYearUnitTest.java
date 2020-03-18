@@ -3,6 +3,7 @@ package com.ak.cardstore.entities;
 import com.ak.cardstore.Make;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,6 +13,18 @@ import java.time.Year;
 import java.util.stream.Stream;
 
 public class MonthYearUnitTest {
+
+    @Test
+    public void test_WithNullMonth() {
+        Assertions.assertThrows(NullPointerException.class,
+                () -> MonthYear.builder().month(null).year(Make.aYear()).build());
+    }
+
+    @Test
+    public void test_WithNullYear() {
+        Assertions.assertThrows(NullPointerException.class,
+                () -> MonthYear.builder().month(Make.aMonth()).year(null).build());
+    }
 
     @ParameterizedTest
     @MethodSource("testArgumentsProvider")

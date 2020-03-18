@@ -7,6 +7,7 @@ import com.ak.cardstore.pojo.Card;
 import com.ak.cardstore.pojo.Wallet;
 import com.google.common.collect.ImmutableSet;
 
+import java.time.Month;
 import java.time.Year;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -52,6 +53,15 @@ public final class Make {
     public static Year aYear() {
         final int randomYear = anInt(Year.MIN_VALUE, Year.MAX_VALUE);
         return Year.of(randomYear);
+    }
+
+    /**
+     * Returns a pseudorandom {@link Month}
+     *
+     * @return a pseudorandom {@link Month}
+     */
+    public static Month aMonth() {
+        return getRandomElement(Month.values());
     }
 
     /**

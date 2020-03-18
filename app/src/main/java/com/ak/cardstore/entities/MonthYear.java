@@ -6,7 +6,6 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 
 /**
@@ -15,7 +14,6 @@ import lombok.NonNull;
  * @author Abhishek K.
  */
 
-@Getter
 @Builder
 public final class MonthYear {
 
@@ -27,7 +25,7 @@ public final class MonthYear {
     @NonNull
     final Year year;
 
-    public boolean isBefore(final ZonedDateTime dateTime) {
+    public boolean isBefore(@NonNull final ZonedDateTime dateTime) {
         final YearMonth expiryYearMonth = YearMonth.of(this.year.getValue(), this.month);
         final YearMonth dateTimeYearMonth = YearMonth.from(dateTime.toLocalDateTime());
 
