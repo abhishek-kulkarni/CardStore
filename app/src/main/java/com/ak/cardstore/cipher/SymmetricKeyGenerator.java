@@ -4,8 +4,8 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
 import com.ak.cardstore.exception.SymmetricKeyGenerationException;
+import com.google.common.annotations.VisibleForTesting;
 
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +20,7 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.util.LoggerUtil.logError;
+import static com.ak.cardstore.util.StringUtil.toByteArray;
 
 /**
  * A class to generate the Symmetric {@link Key} for the encryption.
@@ -34,10 +35,14 @@ public class SymmetricKeyGenerator {
     public static final String BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC;
     public static final String ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7;
 
-    private static final int USER_AUTHENTICATION_VALIDITY_DURATION_SECONDS = 30;
-    private static final boolean USER_AUTHENTICATION_REQUIRED = true;
-    private static final boolean INVALIDATE_ON_BIOMETRIC_ENROLLMENT = true;
-    private static final boolean DEVICE_UNLOCK_REQUIRED = true;
+    @VisibleForTesting
+    static final int USER_AUTHENTICATION_VALIDITY_DURATION_SECONDS = 30;
+    @VisibleForTesting
+    static final boolean USER_AUTHENTICATION_REQUIRED = true;
+    @VisibleForTesting
+    static final boolean INVALIDATE_ON_BIOMETRIC_ENROLLMENT = true;
+    @VisibleForTesting
+    static final boolean DEVICE_UNLOCK_REQUIRED = true;
 
     private static final String NO_SUCH_ALGORITHM_ERROR = "Symmetric key generation failed for algorithm %s";
     private static final String INVALID_KEY_GEN_PARAMETER_SPEC_ERROR = "Invalid KeyGenParameterSpec %s";
@@ -50,7 +55,7 @@ public class SymmetricKeyGenerator {
      * @return Symmetric {@link Key} for the encryption/decryption
      * @throws NoSuchProviderException if the specified provider is not registered in the security provider list
      */
-    public SecretKey generate(@NonNull final String provider, @NonNull final String keyAlias, final String password)
+    public SecretKey generate(@NonNull final String provider, @NonNull final String keyAlias, @NonNull final String password)
             throws NoSuchProviderException {
         final KeyGenParameterSpec keyGenParameterSpec = this.buildKeyGenParameterSpec(keyAlias);
 
@@ -63,7 +68,7 @@ public class SymmetricKeyGenerator {
         }
 
         try {
-            keyGenerator.init(keyGenParameterSpec, new SecureRandom(password.getBytes(StandardCharsets.UTF_8)));
+            keyGenerator.init(keyGenParameterSpec, new SecureRandom(toByteArray(password)));
         } catch (final InvalidAlgorithmParameterException e) {
             final String errorMessage = logError(log, Optional.of(e), INVALID_KEY_GEN_PARAMETER_SPEC_ERROR, keyGenParameterSpec);
             throw new SymmetricKeyGenerationException(errorMessage, e);

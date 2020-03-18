@@ -72,6 +72,14 @@ public class SymmetricKeyCipher {
         return ImmutablePair.of(getString(cipherText), getString(cipher.getIV()));
     }
 
+    /**
+     * Decrypts the passed data and returns it
+     *
+     * @param dataToDecrypt data to decrypt
+     * @param password      password to use for decryption
+     * @param initialVector initial vector to use for decryption
+     * @return decrypted data
+     */
     public String decrypt(@NonNull final String dataToDecrypt, @NonNull final String password, @NonNull final String initialVector) {
         final Key symmetricKey = this.retrieveSymmetricKey(password);
         final Cipher cipher = this.loadCipher(Cipher.DECRYPT_MODE, symmetricKey, Optional.of(toByteArray(initialVector)));
