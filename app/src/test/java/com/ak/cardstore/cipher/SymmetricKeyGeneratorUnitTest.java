@@ -54,7 +54,7 @@ public class SymmetricKeyGeneratorUnitTest {
     private KeyGenParameterSpec.Builder mockKeyGenParameterSpecBuilder;
 
     @Mock
-    private KeyGenParameterSpec keyGenParameterSpec;
+    private KeyGenParameterSpec mockKeyGenParameterSpec;
 
     @Before
     public void setup() throws Exception {
@@ -74,7 +74,7 @@ public class SymmetricKeyGeneratorUnitTest {
         when(this.mockKeyGenParameterSpecBuilder.setUnlockedDeviceRequired(DEVICE_UNLOCK_REQUIRED))
                 .thenReturn(this.mockKeyGenParameterSpecBuilder);
         when(this.mockKeyGenParameterSpecBuilder.build())
-                .thenReturn(this.keyGenParameterSpec);
+                .thenReturn(this.mockKeyGenParameterSpec);
     }
 
     @Test
@@ -84,16 +84,16 @@ public class SymmetricKeyGeneratorUnitTest {
         final String provider = Make.aString();
         final String password = Make.aString();
 
-        final KeyGenerator keyGenerator = mock(KeyGenerator.class);
-        final SecretKey symmetricKey = mock(SecretKey.class);
+        final KeyGenerator mockKeyGenerator = mock(KeyGenerator.class);
+        final SecretKey mockSymmetricKey = mock(SecretKey.class);
 
         mockStatic(KeyGenerator.class);
-        when(KeyGenerator.getInstance(KEY_ALGORITHM, provider)).thenReturn(keyGenerator);
-        doNothing().when(keyGenerator).init(any(KeyGenParameterSpec.class), any(SecureRandom.class));
-        when(keyGenerator.generateKey()).thenReturn(symmetricKey);
+        when(KeyGenerator.getInstance(KEY_ALGORITHM, provider)).thenReturn(mockKeyGenerator);
+        doNothing().when(mockKeyGenerator).init(any(KeyGenParameterSpec.class), any(SecureRandom.class));
+        when(mockKeyGenerator.generateKey()).thenReturn(mockSymmetricKey);
 
         final SecretKey secretKey = symmetricKeyGenerator.generate(provider, KEY_ALIAS, password);
-        Assert.assertSame(symmetricKey, secretKey);
+        Assert.assertSame(mockSymmetricKey, secretKey);
     }
 
     @Test
@@ -119,12 +119,11 @@ public class SymmetricKeyGeneratorUnitTest {
         final String provider = Make.aString();
         final String password = Make.aString();
 
-        final KeyGenerator keyGenerator = mock(KeyGenerator.class);
-        final SecretKey symmetricKey = mock(SecretKey.class);
+        final KeyGenerator mockKeyGenerator = mock(KeyGenerator.class);
 
         mockStatic(KeyGenerator.class);
-        when(KeyGenerator.getInstance(KEY_ALGORITHM, provider)).thenReturn(keyGenerator);
-        doThrow(new InvalidAlgorithmParameterException()).when(keyGenerator).init(any(KeyGenParameterSpec.class), any(SecureRandom.class));
+        when(KeyGenerator.getInstance(KEY_ALGORITHM, provider)).thenReturn(mockKeyGenerator);
+        doThrow(new InvalidAlgorithmParameterException()).when(mockKeyGenerator).init(any(KeyGenParameterSpec.class), any(SecureRandom.class));
 
         final SymmetricKeyGenerationException symmetricKeyGenerationException = Assert.assertThrows(SymmetricKeyGenerationException.class,
                 () -> symmetricKeyGenerator.generate(provider, KEY_ALIAS, password));

@@ -25,6 +25,12 @@ public class KeyStoreRetriever {
     private static final String INVALID_KEY_STORE_ERROR = "Invalid key store %s";
     private static final String KEY_STORE_LOAD_ERROR = "Error loading key store %s";
 
+    /**
+     * Retrieves the {@link KeyStore}
+     *
+     * @param keyStoreType type of the key store to retrieve
+     * @return {@link KeyStore}
+     */
     public KeyStore retrieve(final String keyStoreType) {
         final KeyStore keyStore;
         try {

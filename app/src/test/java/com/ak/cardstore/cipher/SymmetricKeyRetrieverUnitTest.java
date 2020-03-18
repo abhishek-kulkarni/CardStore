@@ -44,10 +44,10 @@ import static org.mockito.Mockito.when;
 public class SymmetricKeyRetrieverUnitTest {
 
     @Mock
-    private KeyStoreRetriever keyStoreRetriever;
+    private KeyStoreRetriever mockKeyStoreRetriever;
 
     @Mock
-    private SymmetricKeyGenerator symmetricKeyGenerator;
+    private SymmetricKeyGenerator mockSymmetricKeyGenerator;
 
     @InjectMocks
     private SymmetricKeyRetriever symmetricKeyRetriever;
@@ -66,7 +66,7 @@ public class SymmetricKeyRetrieverUnitTest {
         final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
         testKeyStore.load(null);
 
-        when(this.keyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(true);
         when(mockKeyStoreSpi.engineGetKey(keyAlias, password.toCharArray())).thenReturn(mockSymmetricKey);
 
@@ -74,10 +74,10 @@ public class SymmetricKeyRetrieverUnitTest {
         assertSame(mockSymmetricKey, symmetricKey);
 
         verify(mockKeyStoreSpi).engineLoad(null);
-        verify(this.keyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(mockKeyStoreSpi).engineGetKey(keyAlias, password.toCharArray());
-        verifyNoInteractions(this.symmetricKeyGenerator);
+        verifyNoInteractions(this.mockSymmetricKeyGenerator);
     }
 
     @Test
@@ -89,16 +89,16 @@ public class SymmetricKeyRetrieverUnitTest {
 
         final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
 
-        when(this.keyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
 
         final SymmetricKeyRetrievalException symmetricKeyRetrievalException = assertThrows(SymmetricKeyRetrievalException.class,
                 () -> this.symmetricKeyRetriever.retrieve(keyAlias, password));
         assertEquals("Key store AndroidKeyStore not initialized", symmetricKeyRetrievalException.getMessage());
         assertTrue(symmetricKeyRetrievalException.getCause() instanceof KeyStoreException);
 
-        verify(this.keyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verifyNoInteractions(mockKeyStoreSpi);
-        verifyNoInteractions(this.symmetricKeyGenerator);
+        verifyNoInteractions(this.mockSymmetricKeyGenerator);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class SymmetricKeyRetrieverUnitTest {
         final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
         testKeyStore.load(null);
 
-        when(this.keyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(true);
         when(mockKeyStoreSpi.engineGetKey(keyAlias, password.toCharArray())).thenThrow(NoSuchAlgorithmException.class);
 
@@ -123,10 +123,10 @@ public class SymmetricKeyRetrieverUnitTest {
         assertTrue(symmetricKeyRetrievalException.getCause() instanceof NoSuchAlgorithmException);
 
         verify(mockKeyStoreSpi).engineLoad(null);
-        verify(this.keyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(mockKeyStoreSpi).engineGetKey(keyAlias, password.toCharArray());
-        verifyNoInteractions(this.symmetricKeyGenerator);
+        verifyNoInteractions(this.mockSymmetricKeyGenerator);
     }
 
     @Test
@@ -141,17 +141,17 @@ public class SymmetricKeyRetrieverUnitTest {
         final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
         testKeyStore.load(null);
 
-        when(this.keyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(true);
         when(mockKeyStoreSpi.engineGetKey(keyAlias, password.toCharArray())).thenThrow(UnrecoverableKeyException.class);
 
         assertThrows(UnrecoverableKeyException.class, () -> this.symmetricKeyRetriever.retrieve(keyAlias, password));
 
         verify(mockKeyStoreSpi).engineLoad(null);
-        verify(this.keyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(mockKeyStoreSpi).engineGetKey(keyAlias, password.toCharArray());
-        verifyNoInteractions(this.symmetricKeyGenerator);
+        verifyNoInteractions(this.mockSymmetricKeyGenerator);
     }
 
     @Test
@@ -168,19 +168,19 @@ public class SymmetricKeyRetrieverUnitTest {
         final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
         testKeyStore.load(null);
 
-        when(this.keyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(false);
-        when(this.symmetricKeyGenerator.generate("AndroidKeyStore", keyAlias, password)).thenReturn(mockSymmetricKey);
+        when(this.mockSymmetricKeyGenerator.generate("AndroidKeyStore", keyAlias, password)).thenReturn(mockSymmetricKey);
         doNothing().when(mockKeyStoreSpi).engineSetKeyEntry(keyAlias, mockSymmetricKey, password.toCharArray(), null);
 
         final Key symmetricKey = this.symmetricKeyRetriever.retrieve(keyAlias, password);
         assertSame(mockSymmetricKey, symmetricKey);
 
         verify(mockKeyStoreSpi).engineLoad(null);
-        verify(this.keyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(mockKeyStoreSpi, never()).engineGetKey(keyAlias, password.toCharArray());
-        verify(this.symmetricKeyGenerator).generate("AndroidKeyStore", keyAlias, password);
+        verify(this.mockSymmetricKeyGenerator).generate("AndroidKeyStore", keyAlias, password);
         verify(mockKeyStoreSpi).engineSetKeyEntry(keyAlias, mockSymmetricKey, password.toCharArray(), null);
     }
 
@@ -196,9 +196,9 @@ public class SymmetricKeyRetrieverUnitTest {
         final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
         testKeyStore.load(null);
 
-        when(this.keyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(false);
-        when(this.symmetricKeyGenerator.generate("AndroidKeyStore", keyAlias, password)).thenThrow(NoSuchProviderException.class);
+        when(this.mockSymmetricKeyGenerator.generate("AndroidKeyStore", keyAlias, password)).thenThrow(NoSuchProviderException.class);
 
         final SymmetricKeyRetrievalException symmetricKeyRetrievalException = assertThrows(SymmetricKeyRetrievalException.class,
                 () -> this.symmetricKeyRetriever.retrieve(keyAlias, password));
@@ -206,10 +206,10 @@ public class SymmetricKeyRetrieverUnitTest {
         assertTrue(symmetricKeyRetrievalException.getCause() instanceof NoSuchProviderException);
 
         verify(mockKeyStoreSpi).engineLoad(null);
-        verify(this.keyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(mockKeyStoreSpi, times(0)).engineGetKey(keyAlias, password.toCharArray());
-        verify(this.symmetricKeyGenerator).generate("AndroidKeyStore", keyAlias, password);
+        verify(this.mockSymmetricKeyGenerator).generate("AndroidKeyStore", keyAlias, password);
         verify(mockKeyStoreSpi, never()).engineSetKeyEntry(anyString(), any(Key.class), any(), any());
     }
 }
