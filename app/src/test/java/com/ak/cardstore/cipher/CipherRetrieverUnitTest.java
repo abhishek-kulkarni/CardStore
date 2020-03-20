@@ -31,6 +31,7 @@ import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -57,6 +58,9 @@ public class CipherRetrieverUnitTest {
                 () -> cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockKey, Optional.empty()));
         assertEquals("Failed to retrieve cipher for transformation " + transformation, cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof NoSuchAlgorithmException);
+
+        verifyStatic(Cipher.class);
+        Cipher.getInstance(transformation);
     }
 
     @Test
@@ -74,6 +78,9 @@ public class CipherRetrieverUnitTest {
                 () -> cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockKey, Optional.empty()));
         assertEquals("Failed to retrieve cipher for transformation " + transformation, cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof NoSuchPaddingException);
+
+        verifyStatic(Cipher.class);
+        Cipher.getInstance(transformation);
     }
 
     @Test
@@ -94,6 +101,10 @@ public class CipherRetrieverUnitTest {
                 () -> cipherRetriever.retrieve(opMode, mockKey, Optional.empty()));
         assertEquals("Failed to retrieve cipher due to invalid key", cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof InvalidKeyException);
+
+        verifyStatic(Cipher.class);
+        Cipher.getInstance(transformation);
+        verify(mockCipher).init(opMode, mockKey);
     }
 
     @Test
@@ -116,6 +127,10 @@ public class CipherRetrieverUnitTest {
                 () -> cipherRetriever.retrieve(opMode, mockKey, Optional.of(initialVector.getBytes(StandardCharsets.UTF_8))));
         assertEquals("Failed to retrieve cipher due to invalid initial vector", cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof InvalidAlgorithmParameterException);
+
+        verifyStatic(Cipher.class);
+        Cipher.getInstance(transformation);
+        verify(mockCipher).init(anyInt(), any(Key.class), any(IvParameterSpec.class));
     }
 
     @Test
@@ -135,6 +150,8 @@ public class CipherRetrieverUnitTest {
         final Cipher cipher = cipherRetriever.retrieve(opMode, mockKey, Optional.empty());
         assertSame(mockCipher, cipher);
 
+        verifyStatic(Cipher.class);
+        Cipher.getInstance(transformation);
         verify(mockCipher).init(opMode, mockKey);
     }
 
@@ -157,6 +174,8 @@ public class CipherRetrieverUnitTest {
         final Cipher cipher = cipherRetriever.retrieve(opMode, mockKey, Optional.of(initialVector.getBytes(StandardCharsets.UTF_8)));
         assertSame(mockCipher, cipher);
 
+        verifyStatic(Cipher.class);
+        Cipher.getInstance(transformation);
         verify(mockCipher).init(anyInt(), any(Key.class), any(IvParameterSpec.class));
     }
 }

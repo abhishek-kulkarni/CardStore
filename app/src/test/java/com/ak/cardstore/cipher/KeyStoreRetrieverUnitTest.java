@@ -21,9 +21,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -73,6 +75,10 @@ public class KeyStoreRetrieverUnitTest {
                 () -> keyStoreRetriever.retrieve(keyStoreType));
         assertEquals("Error loading key store " + keyStoreType, keyStoreRetrievalException.getMessage());
         assertTrue(keyStoreRetrievalException.getCause() instanceof CertificateException);
+
+        verifyStatic(KeyStore.class);
+        KeyStore.getInstance(keyStoreType);
+        verify(mockKeyStoreSpi).engineLoad(null);
     }
 
     @Test
@@ -92,6 +98,10 @@ public class KeyStoreRetrieverUnitTest {
                 () -> keyStoreRetriever.retrieve(keyStoreType));
         assertEquals("Error loading key store " + keyStoreType, keyStoreRetrievalException.getMessage());
         assertTrue(keyStoreRetrievalException.getCause() instanceof IOException);
+
+        verifyStatic(KeyStore.class);
+        KeyStore.getInstance(keyStoreType);
+        verify(mockKeyStoreSpi).engineLoad(null);
     }
 
     @Test
@@ -111,5 +121,9 @@ public class KeyStoreRetrieverUnitTest {
                 () -> keyStoreRetriever.retrieve(keyStoreType));
         assertEquals("Error loading key store " + keyStoreType, keyStoreRetrievalException.getMessage());
         assertTrue(keyStoreRetrievalException.getCause() instanceof NoSuchAlgorithmException);
+
+        verifyStatic(KeyStore.class);
+        KeyStore.getInstance(keyStoreType);
+        verify(mockKeyStoreSpi).engineLoad(null);
     }
 }

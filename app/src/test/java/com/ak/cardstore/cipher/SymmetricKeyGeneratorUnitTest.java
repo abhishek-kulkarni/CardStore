@@ -32,10 +32,12 @@ import static com.ak.cardstore.cipher.SymmetricKeyGenerator.USER_AUTHENTICATION_
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -94,6 +96,11 @@ public class SymmetricKeyGeneratorUnitTest {
 
         final SecretKey secretKey = symmetricKeyGenerator.generate(provider, KEY_ALIAS, password);
         Assert.assertSame(mockSymmetricKey, secretKey);
+
+        verifyStatic(KeyGenerator.class);
+        KeyGenerator.getInstance(KEY_ALGORITHM, provider);
+        verify(mockKeyGenerator).init(any(KeyGenParameterSpec.class), any(SecureRandom.class));
+        verify(mockKeyGenerator).generateKey();
     }
 
     @Test
@@ -110,6 +117,9 @@ public class SymmetricKeyGeneratorUnitTest {
                 () -> symmetricKeyGenerator.generate(provider, KEY_ALIAS, password));
         assertEquals("Symmetric key generation failed for algorithm AES", symmetricKeyGenerationException.getMessage());
         assertTrue(symmetricKeyGenerationException.getCause() instanceof NoSuchAlgorithmException);
+
+        verifyStatic(KeyGenerator.class);
+        KeyGenerator.getInstance(KEY_ALGORITHM, provider);
     }
 
     @Test
@@ -129,5 +139,9 @@ public class SymmetricKeyGeneratorUnitTest {
                 () -> symmetricKeyGenerator.generate(provider, KEY_ALIAS, password));
         assertTrue(symmetricKeyGenerationException.getMessage().startsWith("Invalid KeyGenParameterSpec "));
         assertTrue(symmetricKeyGenerationException.getCause() instanceof InvalidAlgorithmParameterException);
+
+        verifyStatic(KeyGenerator.class);
+        KeyGenerator.getInstance(KEY_ALGORITHM, provider);
+        verify(mockKeyGenerator).init(any(KeyGenParameterSpec.class), any(SecureRandom.class));
     }
 }
