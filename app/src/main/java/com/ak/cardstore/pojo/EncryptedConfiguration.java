@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
- * Represents an encrypted wallet.
+ * Represents an encrypted configuration consisting of serialized and encrypted {@link Wallet} and initial vector needed for decryption.
  *
  * @author Abhishek
  */
@@ -13,7 +13,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @EqualsAndHashCode
-public class EncryptedWallet {
+public class EncryptedConfiguration {
 
     final String serializedAndEncryptedWallet;
 
