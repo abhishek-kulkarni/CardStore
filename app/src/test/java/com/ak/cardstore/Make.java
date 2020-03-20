@@ -84,6 +84,8 @@ public final class Make {
         return Card.builder()
                 .cardProcessor(getRandomElement(CardProcessor.values()))
                 .cardType(getRandomElement(CardType.values()))
+                .cardIssuer(Make.aString())
+                .friendlyName(Make.aString())
                 .cvv(aValidCVV())
                 .expiryDate(aValidExpiryDate())
                 .nameOnCard(aString())

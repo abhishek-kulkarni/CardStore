@@ -20,24 +20,56 @@ import lombok.NonNull;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Card {
 
+    /**
+     * Type of card: Credit or Debit
+     */
     @NonNull
     private final CardType cardType;
 
+    /**
+     * Card processor: Visa, MasterCard, AmEx or Discover
+     */
     @NonNull
     private final CardProcessor cardProcessor;
 
+    /**
+     * Company or institute that issues the card. Example: Bank of America, Chase Bank
+     */
+    @NonNull
+    private final String cardIssuer;
+
+    /**
+     * Optional friendly name of the card like Cash back card, travel card
+     */
+    private final String friendlyName;
+
+    /**
+     * Card number
+     */
     @NonNull
     private final String number;
 
+    /**
+     * Name of the owner on the card
+     */
     @NonNull
     private final String nameOnCard;
 
+    /**
+     * Card expiry date
+     */
     @NonNull
     private final MonthYear expiryDate;
 
+    /**
+     * CVV number for the card
+     */
     @NonNull
     private final String cvv;
 
+    /**
+     * Optional pin for the card
+     */
     private final String pin;
 
     /**
@@ -60,6 +92,11 @@ public final class Card {
         private CardProcessor cardProcessor;
 
         @NonNull
+        private String cardIssuer;
+
+        private String friendlyName;
+
+        @NonNull
         private String number;
 
         @NonNull
@@ -80,6 +117,16 @@ public final class Card {
 
         public Builder cardProcessor(final CardProcessor cardProcessor) {
             this.cardProcessor = cardProcessor;
+            return this;
+        }
+
+        public Builder cardIssuer(final String cardIssuer) {
+            this.cardIssuer = cardIssuer;
+            return this;
+        }
+
+        public Builder friendlyName(final String friendlyName) {
+            this.friendlyName = friendlyName;
             return this;
         }
 
@@ -113,8 +160,14 @@ public final class Card {
             return this;
         }
 
+        /**
+         * Builds and returns an instance of {@link Card}.
+         *
+         * @return an instance of {@link Card}
+         */
         public Card build() {
-            return new Card(this.cardType, this.cardProcessor, this.number, this.nameOnCard, this.expiryDate, this.cvv, this.pin);
+            return new Card(this.cardType, this.cardProcessor, this.cardIssuer, this.friendlyName, this.number, this.nameOnCard,
+                    this.expiryDate, this.cvv, this.pin);
         }
     }
 }
