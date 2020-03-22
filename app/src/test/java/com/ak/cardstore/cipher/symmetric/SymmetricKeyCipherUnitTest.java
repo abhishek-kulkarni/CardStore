@@ -1,7 +1,7 @@
-package com.ak.cardstore.cipher;
+package com.ak.cardstore.cipher.symmetric;
 
 import com.ak.cardstore.Make;
-import com.ak.cardstore.cipher.symmetric.SymmetricKeyRetriever;
+import com.ak.cardstore.cipher.CipherRetriever;
 import com.ak.cardstore.exception.DataEncryptionException;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -39,7 +39,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PowerMockIgnore({"javax.script.*", "javax.management.*"})
 public class SymmetricKeyCipherUnitTest {
 
-    private static final String SYMMETRIC_KEY_ALIAS = "JaiGajanan";
+    private static final String SYMMETRIC_KEY_ALIAS = "com.ak.cardstore.sk";
 
     @Mock
     private SymmetricKeyRetriever mockSymmetricKeyRetriever;

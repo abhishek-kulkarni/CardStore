@@ -39,7 +39,7 @@ public class SymmetricKeyRetriever {
     /**
      * Retrieves and returns the Symmetric {@link Key} for the encryption/decryption.
      * <p>
-     * Generates a new key if one if not already present.
+     * Generates a new key if one is not already present.
      *
      * @param keyAlias the alias name
      * @param password the password for recovering the key

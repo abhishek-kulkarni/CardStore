@@ -1,7 +1,7 @@
 package com.ak.cardstore.configuration;
 
 import com.ak.cardstore.Make;
-import com.ak.cardstore.cipher.SymmetricKeyCipher;
+import com.ak.cardstore.cipher.symmetric.SymmetricKeyCipher;
 import com.ak.cardstore.dao.FileBasedDataAccessor;
 import com.ak.cardstore.exception.ConfigurationManagerException;
 import com.ak.cardstore.pojo.EncryptedConfiguration;

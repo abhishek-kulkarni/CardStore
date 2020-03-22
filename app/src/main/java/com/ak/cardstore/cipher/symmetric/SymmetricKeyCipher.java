@@ -1,6 +1,6 @@
-package com.ak.cardstore.cipher;
+package com.ak.cardstore.cipher.symmetric;
 
-import com.ak.cardstore.cipher.symmetric.SymmetricKeyRetriever;
+import com.ak.cardstore.cipher.CipherRetriever;
 import com.ak.cardstore.exception.DataEncryptionException;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -29,7 +29,7 @@ import static com.ak.cardstore.util.StringUtil.toByteArray;
 @AllArgsConstructor
 public class SymmetricKeyCipher {
 
-    private static final String SYMMETRIC_KEY_ALIAS = "JaiGajanan";
+    private static final String SYMMETRIC_KEY_ALIAS = "com.ak.cardstore.sk";
 
     private static final String KEY_RETRIEVAL_ERROR = "Error retrieving key!";
     private static final String ENCRYPTION_ERROR = "Error encrypting data!";

@@ -52,7 +52,7 @@ public class SymmetricKeyGenerator {
      *
      * @param provider Key generator provider
      * @param keyAlias the alias name
-     * @param password the password for recovering the key
+     * @param password the password for generating the key
      * @return Symmetric {@link Key} for the encryption/decryption
      * @throws NoSuchProviderException if the specified provider is not registered in the security provider list
      */

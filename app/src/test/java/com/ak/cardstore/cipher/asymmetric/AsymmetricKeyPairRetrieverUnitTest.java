@@ -16,6 +16,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -56,16 +57,14 @@ public class AsymmetricKeyPairRetrieverUnitTest {
     private AsymmetricKeyPairGenerator mockAsymmetricKeyPairGenerator;
 
     @InjectMocks
-    private AsymmetricKeyPairRetriever mockAsymmetricKeyPairRetriever;
+    private AsymmetricKeyPairRetriever asymmetricKeyPairRetriever;
 
     @Test
-    public void testRetrieve_WithKeystoreContainsAlias()
+    public void testRetrievePrivateKey_WithKeystoreContainsAlias()
             throws CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         final String keyAlias = Make.aString();
 
         final PrivateKey mockPrivateKey = mock(PrivateKey.class);
-        final Certificate mockCertificate = mock(Certificate.class);
-        final PublicKey mockPublicKey = mock(PublicKey.class);
 
         final KeyStoreSpi mockKeyStoreSpi = mock(KeyStoreSpi.class);
         final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
@@ -74,24 +73,19 @@ public class AsymmetricKeyPairRetrieverUnitTest {
         when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(true);
         when(mockKeyStoreSpi.engineGetKey(keyAlias, null)).thenReturn(mockPrivateKey);
-        when(mockKeyStoreSpi.engineGetCertificate(keyAlias)).thenReturn(mockCertificate);
-        when(mockCertificate.getPublicKey()).thenReturn(mockPublicKey);
 
-        final KeyPair keyPair = this.mockAsymmetricKeyPairRetriever.retrieve(keyAlias);
-        assertSame(mockPrivateKey, keyPair.getPrivate());
-        assertSame(mockPublicKey, keyPair.getPublic());
+        final Key privateKey = this.asymmetricKeyPairRetriever.retrievePrivateKey(keyAlias);
+        assertSame(mockPrivateKey, privateKey);
 
         verify(mockKeyStoreSpi).engineLoad(null);
         verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(mockKeyStoreSpi).engineGetKey(keyAlias, null);
-        verify(mockKeyStoreSpi).engineGetCertificate(keyAlias);
-        verify(mockCertificate).getPublicKey();
         verifyNoInteractions(this.mockAsymmetricKeyPairGenerator);
     }
 
     @Test
-    public void testRetrieve_ThrowsKeyStoreException() {
+    public void testRetrievePrivateKey_ThrowsKeyStoreException() {
         final String keyAlias = Make.aString();
 
         final KeyStoreSpi mockKeyStoreSpi = mock(KeyStoreSpi.class);
@@ -100,7 +94,7 @@ public class AsymmetricKeyPairRetrieverUnitTest {
         when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
 
         final PrivateKeyRetrievalException privateKeyRetrievalException = assertThrows(PrivateKeyRetrievalException.class,
-                () -> this.mockAsymmetricKeyPairRetriever.retrieve(keyAlias));
+                () -> this.asymmetricKeyPairRetriever.retrievePrivateKey(keyAlias));
         assertEquals("Key store AndroidKeyStore not initialized", privateKeyRetrievalException.getMessage());
         assertTrue(privateKeyRetrievalException.getCause() instanceof KeyStoreException);
 
@@ -110,7 +104,7 @@ public class AsymmetricKeyPairRetrieverUnitTest {
     }
 
     @Test
-    public void testRetrieve_ThrowsNoSuchAlgorithmException()
+    public void testRetrievePrivateKey_ThrowsNoSuchAlgorithmException()
             throws CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         final String keyAlias = Make.aString();
 
@@ -125,7 +119,7 @@ public class AsymmetricKeyPairRetrieverUnitTest {
         when(mockKeyStoreSpi.engineGetKey(keyAlias, null)).thenThrow(NoSuchAlgorithmException.class);
 
         final PrivateKeyRetrievalException privateKeyRetrievalException = assertThrows(PrivateKeyRetrievalException.class,
-                () -> this.mockAsymmetricKeyPairRetriever.retrieve(keyAlias));
+                () -> this.asymmetricKeyPairRetriever.retrievePrivateKey(keyAlias));
         assertEquals("Error retrieving private key with alias " + keyAlias, privateKeyRetrievalException.getMessage());
         assertTrue(privateKeyRetrievalException.getCause() instanceof NoSuchAlgorithmException);
 
@@ -137,7 +131,7 @@ public class AsymmetricKeyPairRetrieverUnitTest {
     }
 
     @Test
-    public void testRetrieve_ThrowsUnrecoverableKeyException()
+    public void testRetrievePrivateKey_ThrowsUnrecoverableKeyException()
             throws CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         final String keyAlias = Make.aString();
 
@@ -151,7 +145,10 @@ public class AsymmetricKeyPairRetrieverUnitTest {
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(true);
         when(mockKeyStoreSpi.engineGetKey(keyAlias, null)).thenThrow(UnrecoverableKeyException.class);
 
-        assertThrows(UnrecoverableKeyException.class, () -> this.mockAsymmetricKeyPairRetriever.retrieve(keyAlias));
+        final PrivateKeyRetrievalException privateKeyRetrievalException = assertThrows(PrivateKeyRetrievalException.class,
+                () -> this.asymmetricKeyPairRetriever.retrievePrivateKey(keyAlias));
+        assertEquals("Error retrieving private key with alias " + keyAlias, privateKeyRetrievalException.getMessage());
+        assertTrue(privateKeyRetrievalException.getCause() instanceof UnrecoverableKeyException);
 
         verify(mockKeyStoreSpi).engineLoad(null);
         verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
@@ -161,34 +158,12 @@ public class AsymmetricKeyPairRetrieverUnitTest {
     }
 
     @Test
-    public void testRetrieve_PublicKeyRetrievalThrowsKeyStoreException() throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
-        final String keyAlias = Make.aString();
-
-        final KeyStore mockKeyStore = mock(KeyStore.class);
-        final PrivateKey mockPrivateKey = mock(PrivateKey.class);
-
-        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(mockKeyStore);
-        when(mockKeyStore.containsAlias(keyAlias)).thenReturn(true);
-        when(mockKeyStore.getKey(keyAlias, null)).thenReturn(mockPrivateKey);
-        when(mockKeyStore.getCertificate(keyAlias)).thenThrow(KeyStoreException.class);
-
-        final PublicKeyRetrievalException publicKeyRetrievalException = assertThrows(PublicKeyRetrievalException.class,
-                () -> this.mockAsymmetricKeyPairRetriever.retrieve(keyAlias));
-        assertEquals("Key store AndroidKeyStore not initialized", publicKeyRetrievalException.getMessage());
-        assertTrue(publicKeyRetrievalException.getCause() instanceof KeyStoreException);
-
-        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
-        verify(mockKeyStore).containsAlias(keyAlias);
-        verify(mockKeyStore).getKey(keyAlias, null);
-        verify(mockKeyStore).getCertificate(keyAlias);
-    }
-
-    @Test
-    public void testRetrieve_WithKeystoreContainsAliasFalse()
+    public void testRetrievePrivateKey_WithKeystoreContainsAliasFalse()
             throws CertificateException, NoSuchAlgorithmException, IOException, NoSuchProviderException, UnrecoverableKeyException {
         final String keyAlias = Make.aString();
 
-        final KeyPair mockKeyPair = new KeyPair(mock(PublicKey.class), mock(PrivateKey.class));
+        final PrivateKey mockPrivateKey = mock(PrivateKey.class);
+        final KeyPair mockKeyPair = new KeyPair(mock(PublicKey.class), mockPrivateKey);
         final KeyStoreSpi mockKeyStoreSpi = mock(KeyStoreSpi.class);
         doNothing().when(mockKeyStoreSpi).engineLoad(null);
 
@@ -199,8 +174,8 @@ public class AsymmetricKeyPairRetrieverUnitTest {
         when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(false);
         when(this.mockAsymmetricKeyPairGenerator.generate("AndroidKeyStore", keyAlias)).thenReturn(mockKeyPair);
 
-        final KeyPair symmetricKey = this.mockAsymmetricKeyPairRetriever.retrieve(keyAlias);
-        assertSame(mockKeyPair, symmetricKey);
+        final Key privateKey = this.asymmetricKeyPairRetriever.retrievePrivateKey(keyAlias);
+        assertSame(mockPrivateKey, privateKey);
 
         verify(mockKeyStoreSpi).engineLoad(null);
         verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
@@ -210,7 +185,7 @@ public class AsymmetricKeyPairRetrieverUnitTest {
     }
 
     @Test
-    public void testRetrieve_WithKeystoreContainsAliasFalse_ThrowsNoSuchProviderException()
+    public void testRetrievePrivateKey_WithKeystoreContainsAliasFalse_ThrowsNoSuchProviderException()
             throws CertificateException, NoSuchAlgorithmException, IOException, NoSuchProviderException, UnrecoverableKeyException {
         final String keyAlias = Make.aString();
 
@@ -225,14 +200,108 @@ public class AsymmetricKeyPairRetrieverUnitTest {
         when(this.mockAsymmetricKeyPairGenerator.generate("AndroidKeyStore", keyAlias)).thenThrow(NoSuchProviderException.class);
 
         final AsymmetricKeyPairRetrievalException asymmetricKeyPairRetrievalException = assertThrows(AsymmetricKeyPairRetrievalException.class,
-                () -> this.mockAsymmetricKeyPairRetriever.retrieve(keyAlias));
-        assertEquals("Error generating a new key using provider AndroidKeyStore", asymmetricKeyPairRetrievalException.getMessage());
+                () -> this.asymmetricKeyPairRetriever.retrievePrivateKey(keyAlias));
+        assertEquals("Error generating a new key pair using provider AndroidKeyStore", asymmetricKeyPairRetrievalException.getMessage());
         assertTrue(asymmetricKeyPairRetrievalException.getCause() instanceof NoSuchProviderException);
 
         verify(mockKeyStoreSpi).engineLoad(null);
         verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
         verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(mockKeyStoreSpi, times(0)).engineGetKey(keyAlias, null);
+        verify(this.mockAsymmetricKeyPairGenerator).generate("AndroidKeyStore", keyAlias);
+    }
+
+    @Test
+    public void testRetrievePublicKey_WithKeystoreContainsAlias() throws CertificateException, NoSuchAlgorithmException, IOException {
+        final String keyAlias = Make.aString();
+
+        final Certificate mockCertificate = mock(Certificate.class);
+        final PublicKey mockPublicKey = mock(PublicKey.class);
+
+        final KeyStoreSpi mockKeyStoreSpi = mock(KeyStoreSpi.class);
+        final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
+        testKeyStore.load(null);
+
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(true);
+        when(mockKeyStoreSpi.engineGetCertificate(keyAlias)).thenReturn(mockCertificate);
+        when(mockCertificate.getPublicKey()).thenReturn(mockPublicKey);
+
+        final Key publicKey = this.asymmetricKeyPairRetriever.retrievePublicKey(keyAlias);
+        assertSame(mockPublicKey, publicKey);
+
+        verify(mockKeyStoreSpi).engineLoad(null);
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
+        verify(mockKeyStoreSpi).engineGetCertificate(keyAlias);
+        verify(mockCertificate).getPublicKey();
+        verifyNoInteractions(this.mockAsymmetricKeyPairGenerator);
+    }
+
+    @Test
+    public void testRetrievePublicKey_WithKeystoreException() {
+        final String keyAlias = Make.aString();
+
+        final KeyStoreSpi mockKeyStoreSpi = mock(KeyStoreSpi.class);
+        final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
+
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+
+        final PublicKeyRetrievalException publicKeyRetrievalException = assertThrows(PublicKeyRetrievalException.class,
+                () -> this.asymmetricKeyPairRetriever.retrievePublicKey(keyAlias));
+        assertEquals("Key store AndroidKeyStore not initialized", publicKeyRetrievalException.getMessage());
+        assertTrue(publicKeyRetrievalException.getCause() instanceof KeyStoreException);
+
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
+        verifyNoInteractions(this.mockAsymmetricKeyPairGenerator);
+    }
+
+    @Test
+    public void testRetrievePublicKey_WithKeystoreContainsAliasFalse()
+            throws CertificateException, NoSuchAlgorithmException, IOException, NoSuchProviderException {
+        final String keyAlias = Make.aString();
+
+        final PublicKey mockPublicKey = mock(PublicKey.class);
+        final KeyPair mockKeyPair = new KeyPair(mockPublicKey, mock(PrivateKey.class));
+
+        final KeyStoreSpi mockKeyStoreSpi = mock(KeyStoreSpi.class);
+        final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
+        testKeyStore.load(null);
+
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(false);
+        when(this.mockAsymmetricKeyPairGenerator.generate("AndroidKeyStore", keyAlias)).thenReturn(mockKeyPair);
+
+        final Key publicKey = this.asymmetricKeyPairRetriever.retrievePublicKey(keyAlias);
+        assertSame(mockPublicKey, publicKey);
+
+        verify(mockKeyStoreSpi).engineLoad(null);
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
+        verify(this.mockAsymmetricKeyPairGenerator).generate("AndroidKeyStore", keyAlias);
+    }
+
+    @Test
+    public void testRetrievePublicKey_WithKeystoreContainsAliasFalse_ThrowsNoSuchProviderException()
+            throws CertificateException, NoSuchAlgorithmException, IOException, NoSuchProviderException {
+        final String keyAlias = Make.aString();
+
+        final KeyStoreSpi mockKeyStoreSpi = mock(KeyStoreSpi.class);
+        final KeyStore testKeyStore = new TestKeyStore(mockKeyStoreSpi, null, null);
+        testKeyStore.load(null);
+
+        when(this.mockKeyStoreRetriever.retrieve("AndroidKeyStore")).thenReturn(testKeyStore);
+        when(mockKeyStoreSpi.engineContainsAlias(keyAlias)).thenReturn(false);
+        when(this.mockAsymmetricKeyPairGenerator.generate("AndroidKeyStore", keyAlias)).thenThrow(NoSuchProviderException.class);
+
+        final AsymmetricKeyPairRetrievalException asymmetricKeyPairRetrievalException = assertThrows(AsymmetricKeyPairRetrievalException.class,
+                () -> this.asymmetricKeyPairRetriever.retrievePublicKey(keyAlias));
+        assertEquals("Error generating a new key pair using provider AndroidKeyStore", asymmetricKeyPairRetrievalException.getMessage());
+        assertTrue(asymmetricKeyPairRetrievalException.getCause() instanceof NoSuchProviderException);
+
+        verify(mockKeyStoreSpi).engineLoad(null);
+        verify(this.mockKeyStoreRetriever).retrieve("AndroidKeyStore");
+        verify(mockKeyStoreSpi).engineContainsAlias(keyAlias);
         verify(this.mockAsymmetricKeyPairGenerator).generate("AndroidKeyStore", keyAlias);
     }
 }
