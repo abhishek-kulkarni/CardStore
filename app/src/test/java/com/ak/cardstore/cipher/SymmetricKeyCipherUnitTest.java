@@ -1,6 +1,7 @@
 package com.ak.cardstore.cipher;
 
 import com.ak.cardstore.Make;
+import com.ak.cardstore.cipher.symmetric.SymmetricKeyRetriever;
 import com.ak.cardstore.exception.DataEncryptionException;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -15,7 +16,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.UnrecoverableKeyException;
-import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -74,7 +74,7 @@ public class SymmetricKeyCipherUnitTest {
         final Cipher mockCipher = mock(Cipher.class);
 
         when(this.mockSymmetricKeyRetriever.retrieve(SYMMETRIC_KEY_ALIAS, password)).thenReturn(mockSymmetricKey);
-        when(this.mockCipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty())).thenReturn(mockCipher);
+        when(this.mockCipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, null)).thenReturn(mockCipher);
         when(mockCipher.doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8))).thenThrow(BadPaddingException.class);
 
         final DataEncryptionException dataEncryptionException = assertThrows(DataEncryptionException.class,
@@ -83,7 +83,7 @@ public class SymmetricKeyCipherUnitTest {
         assertTrue(dataEncryptionException.getCause() instanceof BadPaddingException);
 
         verify(this.mockSymmetricKeyRetriever).retrieve(SYMMETRIC_KEY_ALIAS, password);
-        verify(this.mockCipherRetriever).retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty());
+        verify(this.mockCipherRetriever).retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, null);
         verify(mockCipher).doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -96,7 +96,7 @@ public class SymmetricKeyCipherUnitTest {
         final Cipher mockCipher = mock(Cipher.class);
 
         when(this.mockSymmetricKeyRetriever.retrieve(SYMMETRIC_KEY_ALIAS, password)).thenReturn(mockSymmetricKey);
-        when(this.mockCipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty())).thenReturn(mockCipher);
+        when(this.mockCipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, null)).thenReturn(mockCipher);
         when(mockCipher.doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8))).thenThrow(IllegalBlockSizeException.class);
 
         final DataEncryptionException dataEncryptionException = assertThrows(DataEncryptionException.class,
@@ -105,7 +105,7 @@ public class SymmetricKeyCipherUnitTest {
         assertTrue(dataEncryptionException.getCause() instanceof IllegalBlockSizeException);
 
         verify(this.mockSymmetricKeyRetriever).retrieve(SYMMETRIC_KEY_ALIAS, password);
-        verify(this.mockCipherRetriever).retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty());
+        verify(this.mockCipherRetriever).retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, null);
         verify(mockCipher).doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -120,7 +120,7 @@ public class SymmetricKeyCipherUnitTest {
         final Cipher mockCipher = mock(Cipher.class);
 
         when(this.mockSymmetricKeyRetriever.retrieve(SYMMETRIC_KEY_ALIAS, password)).thenReturn(mockSymmetricKey);
-        when(this.mockCipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty())).thenReturn(mockCipher);
+        when(this.mockCipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, null)).thenReturn(mockCipher);
         when(mockCipher.doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8))).thenReturn(expectedCipherText.getBytes(StandardCharsets.UTF_8));
         when(mockCipher.getIV()).thenReturn(expectedInitialVector.getBytes(StandardCharsets.UTF_8));
 
@@ -129,7 +129,7 @@ public class SymmetricKeyCipherUnitTest {
         assertEquals(expectedInitialVector, encryptedDataIvPair.getRight());
 
         verify(this.mockSymmetricKeyRetriever).retrieve(SYMMETRIC_KEY_ALIAS, password);
-        verify(this.mockCipherRetriever).retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty());
+        verify(this.mockCipherRetriever).retrieve(Cipher.ENCRYPT_MODE, mockSymmetricKey, null);
         verify(mockCipher).doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8));
         verify(mockCipher).getIV();
     }
@@ -145,14 +145,14 @@ public class SymmetricKeyCipherUnitTest {
         final Cipher mockCipher = mock(Cipher.class);
 
         when(this.mockSymmetricKeyRetriever.retrieve(SYMMETRIC_KEY_ALIAS, password)).thenReturn(mockSymmetricKey);
-        when(this.mockCipherRetriever.retrieve(anyInt(), any(Key.class), any(Optional.class))).thenReturn(mockCipher);
+        when(this.mockCipherRetriever.retrieve(anyInt(), any(Key.class), any())).thenReturn(mockCipher);
         when(mockCipher.doFinal(dataToDecrypt.getBytes(StandardCharsets.UTF_8))).thenReturn(expectedPlainText.getBytes(StandardCharsets.UTF_8));
 
         final String decryptedData = this.symmetricKeyCipher.decrypt(dataToDecrypt, password, initialVector);
         assertEquals(expectedPlainText, decryptedData);
 
         verify(this.mockSymmetricKeyRetriever).retrieve(SYMMETRIC_KEY_ALIAS, password);
-        verify(this.mockCipherRetriever).retrieve(anyInt(), any(Key.class), any(Optional.class));
+        verify(this.mockCipherRetriever).retrieve(anyInt(), any(Key.class), any());
         verify(mockCipher).doFinal(dataToDecrypt.getBytes(StandardCharsets.UTF_8));
     }
 }

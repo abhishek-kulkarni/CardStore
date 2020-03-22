@@ -14,9 +14,9 @@ import javax.crypto.spec.IvParameterSpec;
 
 import lombok.extern.log4j.Log4j2;
 
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.BLOCK_MODE;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.ENCRYPTION_PADDING;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.KEY_ALGORITHM;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.BLOCK_MODE;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.ENCRYPTION_PADDING;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.KEY_ALGORITHM;
 import static com.ak.cardstore.util.LoggerUtil.logError;
 
 /**
@@ -37,13 +37,13 @@ public class CipherRetriever {
     /**
      * Retrieves the {@link Cipher}.
      *
-     * @param opMode                operation mode of this cipher (one of the <code>ENCRYPT_MODE</code>, <code>DECRYPT_MODE</code>,
-     *                              <code>WRAP_MODE</code> or <code>UNWRAP_MODE</code>)
-     * @param symmetricKey          key to be used with cipher
-     * @param optionalInitialVector initial vector, needed only for opMode = DECRYPT_MODE
+     * @param opMode        operation mode of this cipher (one of the <code>ENCRYPT_MODE</code>, <code>DECRYPT_MODE</code>,
+     *                      <code>WRAP_MODE</code> or <code>UNWRAP_MODE</code>)
+     * @param symmetricKey  key to be used with cipher
+     * @param initialVector initial vector, needed only for opMode = DECRYPT_MODE
      * @return {@link Cipher}
      */
-    public Cipher retrieve(final int opMode, final Key symmetricKey, final Optional<byte[]> optionalInitialVector) {
+    public Cipher retrieve(final int opMode, final Key symmetricKey, final byte[] initialVector) {
         final Cipher cipher;
         try {
             cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
@@ -53,8 +53,8 @@ public class CipherRetriever {
         }
 
         try {
-            if (optionalInitialVector.isPresent() && opMode == Cipher.DECRYPT_MODE) {
-                cipher.init(opMode, symmetricKey, new IvParameterSpec(optionalInitialVector.get()));
+            if (opMode == Cipher.DECRYPT_MODE) {
+                cipher.init(opMode, symmetricKey, new IvParameterSpec(initialVector));
             } else {
                 cipher.init(opMode, symmetricKey);
             }

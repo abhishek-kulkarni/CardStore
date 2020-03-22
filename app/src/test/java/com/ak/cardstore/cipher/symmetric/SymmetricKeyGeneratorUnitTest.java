@@ -1,5 +1,6 @@
-package com.ak.cardstore.cipher;
+package com.ak.cardstore.cipher.symmetric;
 
+import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
@@ -15,6 +16,8 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -22,13 +25,13 @@ import java.security.SecureRandom;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.BLOCK_MODE;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.DEVICE_UNLOCK_REQUIRED;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.ENCRYPTION_PADDING;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.INVALIDATE_ON_BIOMETRIC_ENROLLMENT;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.KEY_ALGORITHM;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.USER_AUTHENTICATION_REQUIRED;
-import static com.ak.cardstore.cipher.SymmetricKeyGenerator.USER_AUTHENTICATION_VALIDITY_DURATION_SECONDS;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.BLOCK_MODE;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.DEVICE_UNLOCK_REQUIRED;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.ENCRYPTION_PADDING;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.INVALIDATE_ON_BIOMETRIC_ENROLLMENT;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.KEY_ALGORITHM;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.USER_AUTHENTICATION_REQUIRED;
+import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.USER_AUTHENTICATION_VALIDITY_DURATION_SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,6 +80,15 @@ public class SymmetricKeyGeneratorUnitTest {
                 .thenReturn(this.mockKeyGenParameterSpecBuilder);
         when(this.mockKeyGenParameterSpecBuilder.build())
                 .thenReturn(this.mockKeyGenParameterSpec);
+
+        final Field sdkIntField = Build.VERSION.class.getField("SDK_INT");
+        sdkIntField.setAccessible(true);
+
+        final Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(sdkIntField, sdkIntField.getModifiers() & ~Modifier.FINAL);
+
+        sdkIntField.set(null, android.os.Build.VERSION_CODES.P);
     }
 
     @Test

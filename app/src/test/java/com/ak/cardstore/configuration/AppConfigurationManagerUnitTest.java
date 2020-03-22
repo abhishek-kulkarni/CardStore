@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AppConfigurationManagerUnitTest {
 
-    private static final String CONFIGURATION_FILE_NAME = "wallet.cdb";
+    private static final String CONFIGURATION_FILE_NAME = "com.ak.cardstore.wallet.cdb";
 
     @Mock
     private Serializer<Wallet> mockWalletSerializer;

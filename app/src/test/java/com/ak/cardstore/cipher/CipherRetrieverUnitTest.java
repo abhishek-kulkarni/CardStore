@@ -14,7 +14,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -55,7 +54,7 @@ public class CipherRetrieverUnitTest {
         when(Cipher.getInstance(transformation)).thenThrow(NoSuchAlgorithmException.class);
 
         final CipherRetrievalException cipherRetrievalException = assertThrows(CipherRetrievalException.class,
-                () -> cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockKey, Optional.empty()));
+                () -> cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockKey, null));
         assertEquals("Failed to retrieve cipher for transformation " + transformation, cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof NoSuchAlgorithmException);
 
@@ -75,7 +74,7 @@ public class CipherRetrieverUnitTest {
         when(Cipher.getInstance(transformation)).thenThrow(NoSuchPaddingException.class);
 
         final CipherRetrievalException cipherRetrievalException = assertThrows(CipherRetrievalException.class,
-                () -> cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockKey, Optional.empty()));
+                () -> cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, mockKey, null));
         assertEquals("Failed to retrieve cipher for transformation " + transformation, cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof NoSuchPaddingException);
 
@@ -98,7 +97,7 @@ public class CipherRetrieverUnitTest {
         doThrow(new InvalidKeyException()).when(mockCipher).init(opMode, mockKey);
 
         final CipherRetrievalException cipherRetrievalException = assertThrows(CipherRetrievalException.class,
-                () -> cipherRetriever.retrieve(opMode, mockKey, Optional.empty()));
+                () -> cipherRetriever.retrieve(opMode, mockKey, null));
         assertEquals("Failed to retrieve cipher due to invalid key", cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof InvalidKeyException);
 
@@ -124,7 +123,7 @@ public class CipherRetrieverUnitTest {
         doThrow(new InvalidAlgorithmParameterException()).when(mockCipher).init(anyInt(), any(Key.class), any(IvParameterSpec.class));
 
         final CipherRetrievalException cipherRetrievalException = assertThrows(CipherRetrievalException.class,
-                () -> cipherRetriever.retrieve(opMode, mockKey, Optional.of(initialVector.getBytes(StandardCharsets.UTF_8))));
+                () -> cipherRetriever.retrieve(opMode, mockKey, initialVector.getBytes(StandardCharsets.UTF_8)));
         assertEquals("Failed to retrieve cipher due to invalid initial vector", cipherRetrievalException.getMessage());
         assertTrue(cipherRetrievalException.getCause() instanceof InvalidAlgorithmParameterException);
 
@@ -147,7 +146,7 @@ public class CipherRetrieverUnitTest {
         when(Cipher.getInstance(transformation)).thenReturn(mockCipher);
         doNothing().when(mockCipher).init(opMode, mockKey);
 
-        final Cipher cipher = cipherRetriever.retrieve(opMode, mockKey, Optional.empty());
+        final Cipher cipher = cipherRetriever.retrieve(opMode, mockKey, null);
         assertSame(mockCipher, cipher);
 
         verifyStatic(Cipher.class);
@@ -171,7 +170,7 @@ public class CipherRetrieverUnitTest {
         when(Cipher.getInstance(transformation)).thenReturn(mockCipher);
         doNothing().when(mockCipher).init(anyInt(), any(Key.class), any(IvParameterSpec.class));
 
-        final Cipher cipher = cipherRetriever.retrieve(opMode, mockKey, Optional.of(initialVector.getBytes(StandardCharsets.UTF_8)));
+        final Cipher cipher = cipherRetriever.retrieve(opMode, mockKey, initialVector.getBytes(StandardCharsets.UTF_8));
         assertSame(mockCipher, cipher);
 
         verifyStatic(Cipher.class);

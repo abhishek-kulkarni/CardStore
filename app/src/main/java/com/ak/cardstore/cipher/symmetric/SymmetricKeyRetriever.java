@@ -1,5 +1,6 @@
-package com.ak.cardstore.cipher;
+package com.ak.cardstore.cipher.symmetric;
 
+import com.ak.cardstore.cipher.KeyStoreRetriever;
 import com.ak.cardstore.exception.SymmetricKeyRetrievalException;
 
 import java.security.Key;

@@ -1,4 +1,4 @@
-package com.ak.cardstore.cipher;
+package com.ak.cardstore.cipher.symmetric;
 
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -23,7 +23,7 @@ import static com.ak.cardstore.util.LoggerUtil.logError;
 import static com.ak.cardstore.util.StringUtil.toByteArray;
 
 /**
- * A class to generate the Symmetric {@link Key} for the encryption.
+ * A class to generate the Symmetric {@link Key} for the cipher operation.
  *
  * @author Abhishek
  */
@@ -50,6 +50,7 @@ public class SymmetricKeyGenerator {
     /**
      * Generates and returns a new Symmetric {@link Key} for the encryption/decryption.
      *
+     * @param provider Key generator provider
      * @param keyAlias the alias name
      * @param password the password for recovering the key
      * @return Symmetric {@link Key} for the encryption/decryption

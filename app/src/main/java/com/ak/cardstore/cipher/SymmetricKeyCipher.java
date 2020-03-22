@@ -1,12 +1,12 @@
 package com.ak.cardstore.cipher;
 
+import com.ak.cardstore.cipher.symmetric.SymmetricKeyRetriever;
 import com.ak.cardstore.exception.DataEncryptionException;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.security.Key;
 import java.security.UnrecoverableKeyException;
-import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -47,7 +47,7 @@ public class SymmetricKeyCipher {
      */
     public ImmutablePair<String, String> encrypt(@NonNull final String dataToEncrypt, @NonNull final String password) {
         final Key symmetricKey = this.retrieveSymmetricKey(password);
-        final Cipher cipher = this.cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, symmetricKey, Optional.empty());
+        final Cipher cipher = this.cipherRetriever.retrieve(Cipher.ENCRYPT_MODE, symmetricKey, null);
 
         final byte[] cipherText = this.doCipherOperation(cipher, dataToEncrypt, ENCRYPTION_ERROR);
         return ImmutablePair.of(getString(cipherText), getString(cipher.getIV()));
@@ -63,7 +63,7 @@ public class SymmetricKeyCipher {
      */
     public String decrypt(@NonNull final String dataToDecrypt, @NonNull final String password, @NonNull final String initialVector) {
         final Key symmetricKey = this.retrieveSymmetricKey(password);
-        final Cipher cipher = this.cipherRetriever.retrieve(Cipher.DECRYPT_MODE, symmetricKey, Optional.of(toByteArray(initialVector)));
+        final Cipher cipher = this.cipherRetriever.retrieve(Cipher.DECRYPT_MODE, symmetricKey, toByteArray(initialVector));
 
         final byte[] plainText = this.doCipherOperation(cipher, dataToDecrypt, DECRYPTION_ERROR);
         return getString(plainText);

@@ -1,7 +1,8 @@
-package com.ak.cardstore.cipher;
+package com.ak.cardstore.cipher.symmetric;
 
 import com.ak.cardstore.Make;
 import com.ak.cardstore.TestKeyStore;
+import com.ak.cardstore.cipher.KeyStoreRetriever;
 import com.ak.cardstore.exception.SymmetricKeyRetrievalException;
 
 import org.junit.jupiter.api.Test;
@@ -130,7 +131,7 @@ public class SymmetricKeyRetrieverUnitTest {
     }
 
     @Test
-    public void testRetrieve_ThrowsNoSuchProviderException()
+    public void testRetrieve_ThrowsUnrecoverableKeyExceptions()
             throws CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         final String keyAlias = Make.aString();
         final String password = Make.aString();
