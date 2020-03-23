@@ -14,9 +14,6 @@ import javax.crypto.spec.IvParameterSpec;
 
 import lombok.extern.log4j.Log4j2;
 
-import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.BLOCK_MODE;
-import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.ENCRYPTION_PADDING;
-import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.KEY_ALGORITHM;
 import static com.ak.cardstore.util.LoggerUtil.logError;
 
 /**
@@ -28,8 +25,6 @@ import static com.ak.cardstore.util.LoggerUtil.logError;
 @Log4j2
 public class CipherRetriever {
 
-    private static final String CIPHER_TRANSFORMATION = String.format("%s/%s/%s", KEY_ALGORITHM, BLOCK_MODE, ENCRYPTION_PADDING);
-
     private static final String CIPHER_TRANSFORMATION_ERROR = "Failed to retrieve cipher for transformation %s";
     private static final String INVALID_KEY_ERROR = "Failed to retrieve cipher due to invalid key";
     private static final String INVALID_INITIAL_VECTOR_ERROR = "Failed to retrieve cipher due to invalid initial vector";
@@ -37,26 +32,27 @@ public class CipherRetriever {
     /**
      * Retrieves the {@link Cipher}.
      *
-     * @param opMode        operation mode of this cipher (one of the <code>ENCRYPT_MODE</code>, <code>DECRYPT_MODE</code>,
-     *                      <code>WRAP_MODE</code> or <code>UNWRAP_MODE</code>)
-     * @param symmetricKey  key to be used with cipher
-     * @param initialVector initial vector, needed only for opMode = DECRYPT_MODE
+     * @param cipherTransformation  cipher transformation
+     * @param opMode                operation mode of this cipher (one of the <code>ENCRYPT_MODE</code>, <code>DECRYPT_MODE</code>,
+     *                              <code>WRAP_MODE</code> or <code>UNWRAP_MODE</code>)
+     * @param key                   key to be used with cipher
+     * @param optionalInitialVector optional initial vector
      * @return {@link Cipher}
      */
-    public Cipher retrieve(final int opMode, final Key symmetricKey, final byte[] initialVector) {
+    public Cipher retrieve(final String cipherTransformation, final int opMode, final Key key, final Optional<byte[]> optionalInitialVector) {
         final Cipher cipher;
         try {
-            cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            cipher = Cipher.getInstance(cipherTransformation);
         } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
-            final String errorMessage = logError(log, Optional.of(e), CIPHER_TRANSFORMATION_ERROR, CIPHER_TRANSFORMATION);
+            final String errorMessage = logError(log, Optional.of(e), CIPHER_TRANSFORMATION_ERROR, cipherTransformation);
             throw new CipherRetrievalException(errorMessage, e);
         }
 
         try {
-            if (opMode == Cipher.DECRYPT_MODE) {
-                cipher.init(opMode, symmetricKey, new IvParameterSpec(initialVector));
+            if (optionalInitialVector.isPresent()) {
+                cipher.init(opMode, key, new IvParameterSpec(optionalInitialVector.get()));
             } else {
-                cipher.init(opMode, symmetricKey);
+                cipher.init(opMode, key);
             }
         } catch (final InvalidKeyException e) {
             log.error(INVALID_KEY_ERROR);
