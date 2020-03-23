@@ -41,7 +41,8 @@ public class AppConfigurationManager {
      * 3. Serialize the encrypted wallet and initial vector
      * 4. Save the serialized encrypted wallet
      *
-     * @param wallet wallet to save
+     * @param wallet   wallet to save
+     * @param password password to encrypt the configuration with
      */
     public void save(final Wallet wallet, final String password) {
         final String serializedWallet = this.walletSerializer.serialize(wallet);
@@ -62,6 +63,16 @@ public class AppConfigurationManager {
         }
     }
 
+    /**
+     * Loads the application configuration by executing the following steps
+     * 1. Read the serialized encrypted wallet
+     * 2. Deserialize the serialized encrypted wallet
+     * 3. decrypt the encrypted wallet
+     * 4. deserialize the serialized wallet
+     *
+     * @param password password to decrypt the configuration with
+     * @return Wallet
+     */
     public Wallet load(final String password) {
         final String serializedEncryptedConfiguration;
         try {

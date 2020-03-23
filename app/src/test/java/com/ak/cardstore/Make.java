@@ -4,6 +4,7 @@ import com.ak.cardstore.entities.CardProcessor;
 import com.ak.cardstore.entities.CardType;
 import com.ak.cardstore.entities.MonthYear;
 import com.ak.cardstore.pojo.Card;
+import com.ak.cardstore.pojo.User;
 import com.ak.cardstore.pojo.Wallet;
 import com.google.common.collect.ImmutableSet;
 
@@ -16,9 +17,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class Make {
 
     /**
-     * Returns a random {@link String}
+     * Returns a pseudorandom {@link String}
      *
-     * @return a random {@link String}
+     * @return a pseudorandom {@link String}
      */
     public static String aString() {
         return UUID.randomUUID().toString();
@@ -237,6 +238,17 @@ public final class Make {
     public static MonthYear anExpiryDateInThePast() {
         final ZonedDateTime zonedDateTime = ZonedDateTime.now().minusMonths(1);
         return MonthYear.of(zonedDateTime.getMonth(), zonedDateTime.getYear());
+    }
+
+    /**
+     * Returns a user with a valid pseudorandom password.
+     *
+     * @return a user with a valid pseudorandom password
+     */
+    public static User aValidUser() {
+        return User.builder()
+                .password("Password123!")
+                .build();
     }
 
     private static <ARRAY_ELEMENT_TYPE> ARRAY_ELEMENT_TYPE getRandomElement(final ARRAY_ELEMENT_TYPE[] array) {
