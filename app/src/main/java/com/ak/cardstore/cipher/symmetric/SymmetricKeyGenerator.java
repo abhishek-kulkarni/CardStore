@@ -4,6 +4,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
 import com.ak.cardstore.exception.SymmetricKeyGenerationException;
+import com.ak.cardstore.util.StringUtil;
 import com.google.common.annotations.VisibleForTesting;
 
 import java.security.InvalidAlgorithmParameterException;
@@ -19,7 +20,6 @@ import javax.crypto.SecretKey;
 import lombok.NonNull;
 
 import static com.ak.cardstore.util.LoggerUtil.logError;
-import static com.ak.cardstore.util.StringUtil.toByteArray;
 
 /**
  * A class to generate the Symmetric {@link Key} for the cipher operation.
@@ -69,7 +69,7 @@ public class SymmetricKeyGenerator {
         }
 
         try {
-            keyGenerator.init(keyGenParameterSpec, new SecureRandom(toByteArray(password)));
+            keyGenerator.init(keyGenParameterSpec, new SecureRandom(StringUtil.toUTF8ByteArray(password)));
         } catch (final InvalidAlgorithmParameterException e) {
             final String errorMessage = logError(LOG_TAG, Optional.of(e), INVALID_KEY_GEN_PARAMETER_SPEC_ERROR, keyGenParameterSpec);
             throw new SymmetricKeyGenerationException(errorMessage, e);

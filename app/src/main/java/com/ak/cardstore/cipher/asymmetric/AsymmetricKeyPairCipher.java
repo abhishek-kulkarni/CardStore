@@ -16,7 +16,10 @@ import lombok.NonNull;
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.BLOCK_MODE;
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.ENCRYPTION_PADDING;
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.KEY_ALGORITHM;
-import static com.ak.cardstore.util.StringUtil.getString;
+import static com.ak.cardstore.util.StringUtil.base64StringToByteArray;
+import static com.ak.cardstore.util.StringUtil.toBase64String;
+import static com.ak.cardstore.util.StringUtil.toUTF8ByteArray;
+import static com.ak.cardstore.util.StringUtil.toUTF8String;
 
 /**
  * A cipher class to handle the encryption and decryption of the data using the asymmetric
@@ -54,9 +57,9 @@ public class AsymmetricKeyPairCipher {
                 Optional.empty());
 
         Log.i(LOG_TAG, "Successfully retrieved the cipher. Encrypting the data.");
-        final byte[] cipherText = this.cipherOperator.doCipherOperation(cipher, dataToEncrypt, ENCRYPTION_ERROR);
+        final byte[] cipherText = this.cipherOperator.doCipherOperation(cipher, toUTF8ByteArray(dataToEncrypt), ENCRYPTION_ERROR);
         Log.i(LOG_TAG, "Successfully encrypted the data. Returning.");
-        return getString(cipherText);
+        return toBase64String(cipherText);
     }
 
     /**
@@ -73,8 +76,8 @@ public class AsymmetricKeyPairCipher {
                 Optional.empty());
 
         Log.i(LOG_TAG, "Successfully retrieved the cipher. Decrypting the data.");
-        final byte[] plainText = this.cipherOperator.doCipherOperation(cipher, dataToDecrypt, DECRYPTION_ERROR);
+        final byte[] plainText = this.cipherOperator.doCipherOperation(cipher, base64StringToByteArray(dataToDecrypt), DECRYPTION_ERROR);
         Log.i(LOG_TAG, "Successfully decrypted the data. Returning.");
-        return getString(plainText);
+        return toUTF8String(plainText);
     }
 }

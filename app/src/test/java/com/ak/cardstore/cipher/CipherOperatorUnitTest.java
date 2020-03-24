@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.ak.cardstore.Make;
 import com.ak.cardstore.exception.CipherOperationException;
+import com.ak.cardstore.util.StringUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,11 +45,11 @@ public class CipherOperatorUnitTest {
     public void testDoCipherOperation() throws BadPaddingException, IllegalBlockSizeException {
         final Cipher mockCipher = mock(Cipher.class);
 
-        final String dataToOperate = Make.aString();
+        final byte[] dataToOperate = StringUtil.toUTF8ByteArray(Make.aString());
         final String operationErrorMessage = Make.aString();
         final byte[] expectedOutputText = Make.aString().getBytes(StandardCharsets.UTF_8);
 
-        when(mockCipher.doFinal(dataToOperate.getBytes(StandardCharsets.UTF_8))).thenReturn(expectedOutputText);
+        when(mockCipher.doFinal(dataToOperate)).thenReturn(expectedOutputText);
 
         final CipherOperator cipherOperator = new CipherOperator();
         final byte[] outputText = cipherOperator.doCipherOperation(mockCipher, dataToOperate, operationErrorMessage);
@@ -59,10 +60,10 @@ public class CipherOperatorUnitTest {
     public void testDoCipherOperation_ThrowsBadPaddingException() throws BadPaddingException, IllegalBlockSizeException {
         final Cipher mockCipher = mock(Cipher.class);
 
-        final String dataToOperate = Make.aString();
+        final byte[] dataToOperate = StringUtil.toUTF8ByteArray(Make.aString());
         final String operationErrorMessage = Make.aString();
 
-        when(mockCipher.doFinal(dataToOperate.getBytes(StandardCharsets.UTF_8))).thenThrow(BadPaddingException.class);
+        when(mockCipher.doFinal(dataToOperate)).thenThrow(BadPaddingException.class);
 
         final CipherOperator cipherOperator = new CipherOperator();
 
@@ -76,11 +77,10 @@ public class CipherOperatorUnitTest {
     public void testDoCipherOperation_ThrowsIllegalBlockSizeException() throws BadPaddingException, IllegalBlockSizeException {
         final Cipher mockCipher = mock(Cipher.class);
 
-        final String dataToOperate = Make.aString();
+        final byte[] dataToOperate = StringUtil.toUTF8ByteArray(Make.aString());
         final String operationErrorMessage = Make.aString();
-        final byte[] expectedOutputText = Make.aString().getBytes(StandardCharsets.UTF_8);
 
-        when(mockCipher.doFinal(dataToOperate.getBytes(StandardCharsets.UTF_8))).thenThrow(IllegalBlockSizeException.class);
+        when(mockCipher.doFinal(dataToOperate)).thenThrow(IllegalBlockSizeException.class);
 
         final CipherOperator cipherOperator = new CipherOperator();
 

@@ -8,8 +8,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 
-import static com.ak.cardstore.util.StringUtil.toByteArray;
-
 /**
  * An operator class to do the cipher operation
  *
@@ -28,10 +26,10 @@ public class CipherOperator {
      * @param operationErrorMessage error message if operation fails
      * @return cipher operation output
      */
-    public byte[] doCipherOperation(final Cipher cipher, final String dataToOperate, final String operationErrorMessage) {
+    public byte[] doCipherOperation(final Cipher cipher, final byte[] dataToOperate, final String operationErrorMessage) {
         final byte[] outputText;
         try {
-            outputText = cipher.doFinal(toByteArray(dataToOperate));
+            outputText = cipher.doFinal(dataToOperate);
         } catch (final BadPaddingException | IllegalBlockSizeException e) {
             Log.e(LOG_TAG, operationErrorMessage, e);
             throw new CipherOperationException(operationErrorMessage, e);

@@ -55,7 +55,7 @@ public class FileBasedDataAccessorUnitTest {
         mockStatic(AppContextProvider.class);
         when(AppContextProvider.getAppContext()).thenReturn(mockAppContext);
         when(mockAppContext.openFileOutput(fileName, Context.MODE_PRIVATE)).thenReturn(mockFileOutputStream);
-        doNothing().when(mockFileOutputStream).write(StringUtil.toByteArray(dataToSave));
+        doNothing().when(mockFileOutputStream).write(StringUtil.toUTF8ByteArray(dataToSave));
 
         final FileBasedDataAccessor fileBasedDataAccessor = new FileBasedDataAccessor();
         fileBasedDataAccessor.save(fileName, dataToSave);
@@ -63,7 +63,7 @@ public class FileBasedDataAccessorUnitTest {
         verifyStatic(AppContextProvider.class);
         AppContextProvider.getAppContext();
         verify(mockAppContext).openFileOutput(fileName, Context.MODE_PRIVATE);
-        verify(mockFileOutputStream).write(StringUtil.toByteArray(dataToSave));
+        verify(mockFileOutputStream).write(StringUtil.toUTF8ByteArray(dataToSave));
     }
 
     @Test

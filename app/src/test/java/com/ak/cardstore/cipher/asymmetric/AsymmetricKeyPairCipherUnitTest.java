@@ -5,6 +5,7 @@ import android.os.Build;
 import com.ak.cardstore.Make;
 import com.ak.cardstore.cipher.CipherOperator;
 import com.ak.cardstore.cipher.CipherRetriever;
+import com.ak.cardstore.util.StringUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +16,7 @@ import org.robolectric.annotation.Config;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Optional;
 
 import javax.crypto.Cipher;
@@ -54,7 +56,8 @@ public class AsymmetricKeyPairCipherUnitTest {
     @Test
     public void testEncrypt() {
         final String dataToEncrypt = Make.aString();
-        final String expectedCipherText = Make.aString();
+        final byte[] cipherTextBytes = Make.aByteArray();
+        final String expectedCipherText = Base64.getEncoder().encodeToString(cipherTextBytes);
 
         final Key mockPublicKey = mock(Key.class);
         final Cipher mockCipher = mock(Cipher.class);
@@ -62,8 +65,8 @@ public class AsymmetricKeyPairCipherUnitTest {
         when(this.mockAsymmetricKeyPairRetriever.retrievePublicKey(ASYMMETRIC_KEY_PAIR_ALIAS)).thenReturn(mockPublicKey);
         when(this.mockCipherRetriever.retrieve(ASYMMETRIC_KEY_PAIR_CIPHER_TRANSFORMATION, Cipher.ENCRYPT_MODE, mockPublicKey, Optional.empty()))
                 .thenReturn(mockCipher);
-        when(this.mockCipherOperator.doCipherOperation(mockCipher, dataToEncrypt, "Error encrypting data!"))
-                .thenReturn(expectedCipherText.getBytes(StandardCharsets.UTF_8));
+        when(this.mockCipherOperator.doCipherOperation(mockCipher, StringUtil.toUTF8ByteArray(dataToEncrypt), "Error encrypting data!"))
+                .thenReturn(cipherTextBytes);
 
         final String encryptedData = this.asymmetricKeyPairCipher.encrypt(dataToEncrypt);
         Assert.assertEquals(expectedCipherText, encryptedData);
@@ -71,7 +74,7 @@ public class AsymmetricKeyPairCipherUnitTest {
 
     @Test
     public void testDecrypt() {
-        final String dataToDecrypt = Make.aString();
+        final String dataToDecrypt = Make.aBase64String();
         final String expectedPlainText = Make.aString();
 
         final Key mockPrivateKey = mock(Key.class);
@@ -80,7 +83,7 @@ public class AsymmetricKeyPairCipherUnitTest {
         when(this.mockAsymmetricKeyPairRetriever.retrievePrivateKey(ASYMMETRIC_KEY_PAIR_ALIAS)).thenReturn(mockPrivateKey);
         when(this.mockCipherRetriever.retrieve(ASYMMETRIC_KEY_PAIR_CIPHER_TRANSFORMATION, Cipher.DECRYPT_MODE, mockPrivateKey, Optional.empty()))
                 .thenReturn(mockCipher);
-        when(this.mockCipherOperator.doCipherOperation(mockCipher, dataToDecrypt, "Error decrypting data!"))
+        when(this.mockCipherOperator.doCipherOperation(mockCipher, StringUtil.base64StringToByteArray(dataToDecrypt), "Error decrypting data!"))
                 .thenReturn(expectedPlainText.getBytes(StandardCharsets.UTF_8));
 
         final String encryptedData = this.asymmetricKeyPairCipher.decrypt(dataToDecrypt);

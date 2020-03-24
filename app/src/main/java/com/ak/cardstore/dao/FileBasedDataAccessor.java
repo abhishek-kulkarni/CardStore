@@ -33,7 +33,7 @@ public class FileBasedDataAccessor {
         final Context appContext = AppContextProvider.getAppContext();
 
         try (final FileOutputStream fileOutputStream = appContext.openFileOutput(fileName, Context.MODE_PRIVATE)) {
-            fileOutputStream.write(StringUtil.toByteArray(dataToSave));
+            fileOutputStream.write(StringUtil.toUTF8ByteArray(dataToSave));
             Log.i(LOG_TAG, "Successfully saved the file " + fileName);
         }
     }

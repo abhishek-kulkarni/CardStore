@@ -6,6 +6,7 @@ import com.ak.cardstore.Make;
 import com.ak.cardstore.cipher.CipherOperator;
 import com.ak.cardstore.cipher.CipherRetriever;
 import com.ak.cardstore.exception.CipherOperationException;
+import com.ak.cardstore.util.StringUtil;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Before;
@@ -20,6 +21,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.UnrecoverableKeyException;
+import java.util.Base64;
 import java.util.Optional;
 
 import javax.crypto.Cipher;
@@ -87,8 +89,10 @@ public class SymmetricKeyCipherUnitTest {
     public void testEncrypt() throws UnrecoverableKeyException {
         final String dataToEncrypt = Make.aString();
         final String password = Make.aString();
-        final String expectedCipherText = Make.aString();
-        final String expectedInitialVector = Make.aString();
+        final byte[] cipherTextBytes = Make.aByteArray();
+        final String expectedCipherText = Base64.getEncoder().encodeToString(cipherTextBytes);
+        final byte[] initialVectorByes = Make.aByteArray();
+        final String expectedInitialVector = Base64.getEncoder().encodeToString(initialVectorByes);
 
         final Key mockSymmetricKey = mock(Key.class);
         final Cipher mockCipher = mock(Cipher.class);
@@ -96,9 +100,9 @@ public class SymmetricKeyCipherUnitTest {
         when(this.mockSymmetricKeyRetriever.retrieve(SYMMETRIC_KEY_ALIAS, password)).thenReturn(mockSymmetricKey);
         when(this.mockCipherRetriever.retrieve(SYMMETRIC_KEY_CIPHER_TRANSFORMATION, Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty()))
                 .thenReturn(mockCipher);
-        when(this.mockCipherOperator.doCipherOperation(mockCipher, dataToEncrypt, "Error encrypting data!"))
-                .thenReturn(expectedCipherText.getBytes(StandardCharsets.UTF_8));
-        when(mockCipher.getIV()).thenReturn(expectedInitialVector.getBytes(StandardCharsets.UTF_8));
+        when(this.mockCipherOperator.doCipherOperation(mockCipher, StringUtil.toUTF8ByteArray(dataToEncrypt), "Error encrypting data!"))
+                .thenReturn(cipherTextBytes);
+        when(mockCipher.getIV()).thenReturn(initialVectorByes);
 
         final ImmutablePair<String, String> encryptedDataIvPair = this.symmetricKeyCipher.encrypt(dataToEncrypt, password);
         assertEquals(expectedCipherText, encryptedDataIvPair.getLeft());
@@ -106,23 +110,23 @@ public class SymmetricKeyCipherUnitTest {
 
         verify(this.mockSymmetricKeyRetriever).retrieve(SYMMETRIC_KEY_ALIAS, password);
         verify(this.mockCipherRetriever).retrieve(SYMMETRIC_KEY_CIPHER_TRANSFORMATION, Cipher.ENCRYPT_MODE, mockSymmetricKey, Optional.empty());
-        verify(this.mockCipherOperator).doCipherOperation(mockCipher, dataToEncrypt, "Error encrypting data!");
+        verify(this.mockCipherOperator).doCipherOperation(mockCipher, StringUtil.toUTF8ByteArray(dataToEncrypt), "Error encrypting data!");
         verify(mockCipher).getIV();
     }
 
     @Test
     public void testDecrypt() throws UnrecoverableKeyException {
-        final String dataToDecrypt = Make.aString();
+        final String dataToDecrypt = Make.aBase64String();
         final String password = Make.aString();
         final String expectedPlainText = Make.aString();
-        final String initialVector = Make.aString();
+        final String initialVector = Make.aBase64String();
 
         final Key mockSymmetricKey = mock(Key.class);
         final Cipher mockCipher = mock(Cipher.class);
 
         when(this.mockSymmetricKeyRetriever.retrieve(SYMMETRIC_KEY_ALIAS, password)).thenReturn(mockSymmetricKey);
         when(this.mockCipherRetriever.retrieve(anyString(), anyInt(), any(Key.class), any())).thenReturn(mockCipher);
-        when(this.mockCipherOperator.doCipherOperation(mockCipher, dataToDecrypt, "Error decrypting data!"))
+        when(this.mockCipherOperator.doCipherOperation(mockCipher, StringUtil.base64StringToByteArray(dataToDecrypt), "Error decrypting data!"))
                 .thenReturn(expectedPlainText.getBytes(StandardCharsets.UTF_8));
 
         final String decryptedData = this.symmetricKeyCipher.decrypt(dataToDecrypt, password, initialVector);
@@ -130,6 +134,6 @@ public class SymmetricKeyCipherUnitTest {
 
         verify(this.mockSymmetricKeyRetriever).retrieve(SYMMETRIC_KEY_ALIAS, password);
         verify(this.mockCipherRetriever).retrieve(anyString(), anyInt(), any(Key.class), any());
-        verify(this.mockCipherOperator).doCipherOperation(mockCipher, dataToDecrypt, "Error decrypting data!");
+        verify(this.mockCipherOperator).doCipherOperation(mockCipher, StringUtil.base64StringToByteArray(dataToDecrypt), "Error decrypting data!");
     }
 }

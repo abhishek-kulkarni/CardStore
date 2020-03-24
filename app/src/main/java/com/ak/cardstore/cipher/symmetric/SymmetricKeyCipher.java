@@ -20,8 +20,10 @@ import lombok.NonNull;
 import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.BLOCK_MODE;
 import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.ENCRYPTION_PADDING;
 import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.KEY_ALGORITHM;
-import static com.ak.cardstore.util.StringUtil.getString;
-import static com.ak.cardstore.util.StringUtil.toByteArray;
+import static com.ak.cardstore.util.StringUtil.base64StringToByteArray;
+import static com.ak.cardstore.util.StringUtil.toBase64String;
+import static com.ak.cardstore.util.StringUtil.toUTF8ByteArray;
+import static com.ak.cardstore.util.StringUtil.toUTF8String;
 
 /**
  * A cipher class to handle the encryption and decryption of the data using the {@link javax.crypto.SecretKey}.
@@ -57,8 +59,8 @@ public class SymmetricKeyCipher {
         final Cipher cipher = this.cipherRetriever.retrieve(SYMMETRIC_KEY_CIPHER_TRANSFORMATION, Cipher.ENCRYPT_MODE, symmetricKey,
                 Optional.empty());
 
-        final byte[] cipherText = this.cipherOperator.doCipherOperation(cipher, dataToEncrypt, ENCRYPTION_ERROR);
-        return ImmutablePair.of(getString(cipherText), getString(cipher.getIV()));
+        final byte[] cipherText = this.cipherOperator.doCipherOperation(cipher, toUTF8ByteArray(dataToEncrypt), ENCRYPTION_ERROR);
+        return ImmutablePair.of(toBase64String(cipherText), toBase64String(cipher.getIV()));
     }
 
     /**
@@ -72,10 +74,10 @@ public class SymmetricKeyCipher {
     public String decrypt(@NonNull final String dataToDecrypt, @NonNull final String password, @NonNull final String initialVector) {
         final Key symmetricKey = this.retrieveSymmetricKey(password);
         final Cipher cipher = this.cipherRetriever.retrieve(SYMMETRIC_KEY_CIPHER_TRANSFORMATION, Cipher.DECRYPT_MODE, symmetricKey,
-                Optional.of(toByteArray(initialVector)));
+                Optional.of(base64StringToByteArray(initialVector)));
 
-        final byte[] plainText = this.cipherOperator.doCipherOperation(cipher, dataToDecrypt, DECRYPTION_ERROR);
-        return getString(plainText);
+        final byte[] plainText = this.cipherOperator.doCipherOperation(cipher, base64StringToByteArray(dataToDecrypt), DECRYPTION_ERROR);
+        return toUTF8String(plainText);
     }
 
     private Key retrieveSymmetricKey(final String password) {

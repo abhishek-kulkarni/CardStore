@@ -8,9 +8,11 @@ import com.ak.cardstore.pojo.User;
 import com.ak.cardstore.pojo.Wallet;
 import com.google.common.collect.ImmutableSet;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Month;
 import java.time.Year;
 import java.time.ZonedDateTime;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -23,6 +25,24 @@ public final class Make {
      */
     public static String aString() {
         return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Returns a pseudorandom Base64 string
+     *
+     * @return a pseudorandom Base64 string
+     */
+    public static String aBase64String() {
+        return Base64.getEncoder().encodeToString(Make.aString().getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Returns byte[] of a pseudorandom {@link String}
+     *
+     * @return byte[] of a pseudorandom {@link String}
+     */
+    public static byte[] aByteArray() {
+        return aString().getBytes(StandardCharsets.UTF_8);
     }
 
     /**
