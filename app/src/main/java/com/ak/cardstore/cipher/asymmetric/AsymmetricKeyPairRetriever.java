@@ -19,7 +19,6 @@ import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.util.LoggerUtil.logError;
 
@@ -29,9 +28,10 @@ import static com.ak.cardstore.util.LoggerUtil.logError;
  * @author Abhishek
  */
 
-@Log4j2
 @AllArgsConstructor
 public class AsymmetricKeyPairRetriever {
+
+    private static final String LOG_TAG = AsymmetricKeyPairRetriever.class.getSimpleName();
 
     private static final String KEY_STORE_TYPE = "AndroidKeyStore";
 
@@ -91,7 +91,7 @@ public class AsymmetricKeyPairRetriever {
                 publicKey = certificate.getPublicKey();
             }
         } catch (final KeyStoreException e) {
-            final String errorMessage = logError(log, Optional.of(e), KEY_STORE_NOT_INITIALIZED_ERROR, KEY_STORE_TYPE);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), KEY_STORE_NOT_INITIALIZED_ERROR, KEY_STORE_TYPE);
             throw new PublicKeyRetrievalException(errorMessage, e);
         }
 
@@ -106,10 +106,10 @@ public class AsymmetricKeyPairRetriever {
                 privateKey = androidKeyStore.getKey(keyAlias, null);
             }
         } catch (final KeyStoreException e) {
-            final String errorMessage = logError(log, Optional.of(e), KEY_STORE_NOT_INITIALIZED_ERROR, KEY_STORE_TYPE);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), KEY_STORE_NOT_INITIALIZED_ERROR, KEY_STORE_TYPE);
             throw new PrivateKeyRetrievalException(errorMessage, e);
         } catch (final NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            final String errorMessage = logError(log, Optional.of(e), PRIVATE_KEY_RETRIEVAL_ERROR, keyAlias);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), PRIVATE_KEY_RETRIEVAL_ERROR, keyAlias);
             throw new PrivateKeyRetrievalException(errorMessage, e);
         }
 
@@ -121,7 +121,7 @@ public class AsymmetricKeyPairRetriever {
         try {
             keyPair = this.asymmetricKeyPairGenerator.generate(KEY_STORE_TYPE, keyAlias);
         } catch (final NoSuchProviderException e) {
-            final String errorMessage = logError(log, Optional.of(e), KEY_PAIR_GENERATION_PROVIDER_ERROR, KEY_STORE_TYPE);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), KEY_PAIR_GENERATION_PROVIDER_ERROR, KEY_STORE_TYPE);
             throw new AsymmetricKeyPairRetrievalException(errorMessage, e);
         }
 

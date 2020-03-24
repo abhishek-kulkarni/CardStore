@@ -1,12 +1,12 @@
 package com.ak.cardstore.cipher;
 
+import android.util.Log;
+
 import com.ak.cardstore.exception.CipherOperationException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-
-import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.util.StringUtil.toByteArray;
 
@@ -16,8 +16,9 @@ import static com.ak.cardstore.util.StringUtil.toByteArray;
  * @author Abhishek
  */
 
-@Log4j2
 public class CipherOperator {
+
+    private static final String LOG_TAG = CipherOperator.class.getSimpleName();
 
     /**
      * Does the cipher operation and returns the output data.
@@ -32,7 +33,7 @@ public class CipherOperator {
         try {
             outputText = cipher.doFinal(toByteArray(dataToOperate));
         } catch (final BadPaddingException | IllegalBlockSizeException e) {
-            log.error(operationErrorMessage, e);
+            Log.e(LOG_TAG, operationErrorMessage, e);
             throw new CipherOperationException(operationErrorMessage, e);
         }
 

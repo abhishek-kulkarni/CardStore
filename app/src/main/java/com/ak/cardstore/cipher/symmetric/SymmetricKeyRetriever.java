@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.util.LoggerUtil.logError;
 
@@ -23,9 +22,10 @@ import static com.ak.cardstore.util.LoggerUtil.logError;
  * @author Abhishek
  */
 
-@Log4j2
 @AllArgsConstructor
 public class SymmetricKeyRetriever {
+
+    private static final String LOG_TAG = SymmetricKeyRetriever.class.getSimpleName();
 
     private static final String KEY_STORE_TYPE = "AndroidKeyStore";
 
@@ -59,13 +59,13 @@ public class SymmetricKeyRetriever {
                 androidKeyStore.setKeyEntry(keyAlias, symmetricKey, password.toCharArray(), null);
             }
         } catch (final KeyStoreException e) {
-            final String errorMessage = logError(log, Optional.of(e), KEY_STORE_NOT_INITIALIZED_ERROR, KEY_STORE_TYPE);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), KEY_STORE_NOT_INITIALIZED_ERROR, KEY_STORE_TYPE);
             throw new SymmetricKeyRetrievalException(errorMessage, e);
         } catch (final NoSuchAlgorithmException e) {
-            final String errorMessage = logError(log, Optional.of(e), KEY_RETRIEVAL_ERROR, keyAlias);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), KEY_RETRIEVAL_ERROR, keyAlias);
             throw new SymmetricKeyRetrievalException(errorMessage, e);
         } catch (final NoSuchProviderException e) {
-            final String errorMessage = logError(log, Optional.of(e), KEY_GENERATION_PROVIDER_ERROR, KEY_STORE_TYPE);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), KEY_GENERATION_PROVIDER_ERROR, KEY_STORE_TYPE);
             throw new SymmetricKeyRetrievalException(errorMessage, e);
         }
 

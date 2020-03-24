@@ -1,5 +1,7 @@
 package com.ak.cardstore.cipher.symmetric;
 
+import android.util.Log;
+
 import com.ak.cardstore.cipher.CipherOperator;
 import com.ak.cardstore.cipher.CipherRetriever;
 import com.ak.cardstore.exception.CipherOperationException;
@@ -14,7 +16,6 @@ import javax.crypto.Cipher;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.BLOCK_MODE;
 import static com.ak.cardstore.cipher.symmetric.SymmetricKeyGenerator.ENCRYPTION_PADDING;
@@ -28,9 +29,10 @@ import static com.ak.cardstore.util.StringUtil.toByteArray;
  * @author Abhishek
  */
 
-@Log4j2
 @AllArgsConstructor
 public class SymmetricKeyCipher {
+
+    private static final String LOG_TAG = SymmetricKeyCipher.class.getSimpleName();
 
     private static final String SYMMETRIC_KEY_CIPHER_TRANSFORMATION = String.format("%s/%s/%s", KEY_ALGORITHM, BLOCK_MODE, ENCRYPTION_PADDING);
     private static final String SYMMETRIC_KEY_ALIAS = "com.ak.cardstore.sk";
@@ -81,7 +83,7 @@ public class SymmetricKeyCipher {
         try {
             symmetricKey = this.symmetricKeyRetriever.retrieve(SYMMETRIC_KEY_ALIAS, password);
         } catch (final UnrecoverableKeyException e) {
-            log.error(KEY_RETRIEVAL_ERROR, e);
+            Log.e(LOG_TAG, KEY_RETRIEVAL_ERROR, e);
             throw new CipherOperationException(KEY_RETRIEVAL_ERROR, e);
         }
 

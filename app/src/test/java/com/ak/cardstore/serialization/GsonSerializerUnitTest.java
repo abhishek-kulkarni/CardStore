@@ -2,6 +2,7 @@ package com.ak.cardstore.serialization;
 
 import com.ak.cardstore.pojo.Wallet;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,6 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 
 public class GsonSerializerUnitTest {
+
+    @Test
+    public void testSerialize_WithNullType() {
+        Assertions.assertThrows(NullPointerException.class, () -> new GsonSerializer<>(null));
+    }
 
     @Test
     public void testSerialize_WithNull() {

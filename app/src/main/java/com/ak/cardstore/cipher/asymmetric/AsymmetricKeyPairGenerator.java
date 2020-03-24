@@ -17,7 +17,6 @@ import java.util.Optional;
 import javax.security.auth.x500.X500Principal;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.util.LoggerUtil.logError;
 
@@ -27,8 +26,9 @@ import static com.ak.cardstore.util.LoggerUtil.logError;
  * @author Abhishek
  */
 
-@Log4j2
 public class AsymmetricKeyPairGenerator {
+
+    private static final String LOG_TAG = AsymmetricKeyPairGenerator.class.getSimpleName();
 
     public static final String KEY_ALGORITHM = KeyProperties.KEY_ALGORITHM_RSA;
     public static final String BLOCK_MODE = KeyProperties.BLOCK_MODE_ECB;
@@ -63,14 +63,14 @@ public class AsymmetricKeyPairGenerator {
         try {
             keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM, provider);
         } catch (final NoSuchAlgorithmException e) {
-            final String errorMessage = logError(log, Optional.of(e), NO_SUCH_ALGORITHM_ERROR, KEY_ALGORITHM);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), NO_SUCH_ALGORITHM_ERROR, KEY_ALGORITHM);
             throw new AsymmetricKeyPairGenerationException(errorMessage, e);
         }
 
         try {
             keyPairGenerator.initialize(keyPairGenParameterSpec, new SecureRandom());
         } catch (final InvalidAlgorithmParameterException e) {
-            final String errorMessage = logError(log, Optional.of(e), INVALID_KEY_GEN_PARAMETER_SPEC_ERROR, keyPairGenParameterSpec);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), INVALID_KEY_GEN_PARAMETER_SPEC_ERROR, keyPairGenParameterSpec);
             throw new AsymmetricKeyPairGenerationException(errorMessage, e);
         }
 

@@ -1,15 +1,17 @@
 package com.ak.cardstore.cipher.symmetric;
 
+import android.os.Build;
+
 import com.ak.cardstore.Make;
 import com.ak.cardstore.TestKeyStore;
 import com.ak.cardstore.cipher.KeyStoreRetriever;
 import com.ak.cardstore.exception.SymmetricKeyRetrievalException;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 import java.security.Key;
@@ -41,17 +43,21 @@ import static org.mockito.Mockito.when;
  * @author Abhishek
  */
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = {Build.VERSION_CODES.O, Build.VERSION_CODES.O_MR1, Build.VERSION_CODES.P})
 public class SymmetricKeyRetrieverUnitTest {
 
-    @Mock
     private KeyStoreRetriever mockKeyStoreRetriever;
-
-    @Mock
     private SymmetricKeyGenerator mockSymmetricKeyGenerator;
-
-    @InjectMocks
     private SymmetricKeyRetriever symmetricKeyRetriever;
+
+    @Before
+    public void setup() {
+        this.mockKeyStoreRetriever = mock(KeyStoreRetriever.class);
+        this.mockSymmetricKeyGenerator = mock(SymmetricKeyGenerator.class);
+
+        this.symmetricKeyRetriever = new SymmetricKeyRetriever(this.mockKeyStoreRetriever, this.mockSymmetricKeyGenerator);
+    }
 
     @Test
     public void testRetrieve_WithKeystoreContainsAlias()

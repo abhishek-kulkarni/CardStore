@@ -1,6 +1,7 @@
 package com.ak.cardstore.dao;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ak.cardstore.context.AppContextProvider;
 import com.ak.cardstore.util.StringUtil;
@@ -12,16 +13,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import lombok.extern.log4j.Log4j2;
-
 /**
  * File based data accessor.
  *
  * @author Abhishek
  */
 
-@Log4j2
 public class FileBasedDataAccessor {
+
+    private static final String LOG_TAG = FileBasedDataAccessor.class.getSimpleName();
 
     /**
      * Saves the data in a file to the storage
@@ -34,7 +34,7 @@ public class FileBasedDataAccessor {
 
         try (final FileOutputStream fileOutputStream = appContext.openFileOutput(fileName, Context.MODE_PRIVATE)) {
             fileOutputStream.write(StringUtil.toByteArray(dataToSave));
-            log.info("Successfully saved the file {}", fileName);
+            Log.i(LOG_TAG, "Successfully saved the file " + fileName);
         }
     }
 
@@ -65,7 +65,7 @@ public class FileBasedDataAccessor {
             }
         }
 
-        log.info("Successfully read the file {}. Returning the file contents.", fileName);
+        Log.i(LOG_TAG, "Successfully read the file " + fileName + ". Returning the file contents.");
         return stringBuilder.toString();
     }
 }

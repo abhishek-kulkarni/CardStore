@@ -1,5 +1,7 @@
 package com.ak.cardstore.configuration;
 
+import android.util.Log;
+
 import com.ak.cardstore.cipher.symmetric.SymmetricKeyCipher;
 import com.ak.cardstore.dao.FileBasedDataAccessor;
 import com.ak.cardstore.exception.ConfigurationManagerException;
@@ -12,7 +14,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.IOException;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * A class to manage the application configuration.
@@ -20,9 +21,10 @@ import lombok.extern.log4j.Log4j2;
  * @author Abhishek
  */
 
-@Log4j2
 @AllArgsConstructor
 public class AppConfigurationManager {
+
+    private static final String LOG_TAG = AppConfigurationManager.class.getSimpleName();
 
     private static final String CONFIGURATION_FILE_NAME = "wallet.cdb";
 
@@ -58,7 +60,7 @@ public class AppConfigurationManager {
         try {
             this.fileBasedDataAccessor.save(CONFIGURATION_FILE_NAME, serializedEncryptedConfiguration);
         } catch (final IOException e) {
-            log.error(CONFIGURATION_SAVE_ERROR, e);
+            Log.e(LOG_TAG, CONFIGURATION_SAVE_ERROR, e);
             throw new ConfigurationManagerException(CONFIGURATION_SAVE_ERROR, e);
         }
     }
@@ -78,7 +80,7 @@ public class AppConfigurationManager {
         try {
             serializedEncryptedConfiguration = this.fileBasedDataAccessor.getContents(CONFIGURATION_FILE_NAME);
         } catch (final IOException e) {
-            log.error(CONFIGURATION_READ_ERROR, e);
+            Log.e(LOG_TAG, CONFIGURATION_READ_ERROR, e);
             throw new ConfigurationManagerException(CONFIGURATION_READ_ERROR, e);
         }
 

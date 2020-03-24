@@ -1,5 +1,7 @@
 package com.ak.cardstore.cipher.asymmetric;
 
+import android.util.Log;
+
 import com.ak.cardstore.cipher.CipherOperator;
 import com.ak.cardstore.cipher.CipherRetriever;
 
@@ -10,7 +12,6 @@ import javax.crypto.Cipher;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.BLOCK_MODE;
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.ENCRYPTION_PADDING;
@@ -24,9 +25,10 @@ import static com.ak.cardstore.util.StringUtil.getString;
  * @author Abhishek
  */
 
-@Log4j2
 @AllArgsConstructor
 public class AsymmetricKeyPairCipher {
+
+    private static final String LOG_TAG = AsymmetricKeyPairCipher.class.getSimpleName();
 
     private static final String ASYMMETRIC_KEY_PAIR_CIPHER_TRANSFORMATION = String.format("%s/%s/%s", KEY_ALGORITHM, BLOCK_MODE, ENCRYPTION_PADDING);
     private static final String ASYMMETRIC_KEY_PAIR_ALIAS = "com.ak.cardstore.askp";
@@ -45,11 +47,15 @@ public class AsymmetricKeyPairCipher {
      * @return encrypted data
      */
     public String encrypt(@NonNull final String dataToEncrypt) {
+        Log.i(LOG_TAG, "Retrieving the public key.");
         final Key publicKey = this.asymmetricKeyPairRetriever.retrievePublicKey(ASYMMETRIC_KEY_PAIR_ALIAS);
+        Log.i(LOG_TAG, "Successfully retrieved the public key. Retrieving the cipher.");
         final Cipher cipher = this.cipherRetriever.retrieve(ASYMMETRIC_KEY_PAIR_CIPHER_TRANSFORMATION, Cipher.ENCRYPT_MODE, publicKey,
                 Optional.empty());
 
+        Log.i(LOG_TAG, "Successfully retrieved the cipher. Encrypting the data.");
         final byte[] cipherText = this.cipherOperator.doCipherOperation(cipher, dataToEncrypt, ENCRYPTION_ERROR);
+        Log.i(LOG_TAG, "Successfully encrypted the data. Returning.");
         return getString(cipherText);
     }
 
@@ -60,11 +66,15 @@ public class AsymmetricKeyPairCipher {
      * @return decrypted data
      */
     public String decrypt(@NonNull final String dataToDecrypt) {
+        Log.i(LOG_TAG, "Retrieving the private key.");
         final Key privateKey = this.asymmetricKeyPairRetriever.retrievePrivateKey(ASYMMETRIC_KEY_PAIR_ALIAS);
+        Log.i(LOG_TAG, "Successfully retrieved the private key. Retrieving the cipher.");
         final Cipher cipher = this.cipherRetriever.retrieve(ASYMMETRIC_KEY_PAIR_CIPHER_TRANSFORMATION, Cipher.DECRYPT_MODE, privateKey,
                 Optional.empty());
 
+        Log.i(LOG_TAG, "Successfully retrieved the cipher. Decrypting the data.");
         final byte[] plainText = this.cipherOperator.doCipherOperation(cipher, dataToDecrypt, DECRYPTION_ERROR);
+        Log.i(LOG_TAG, "Successfully decrypted the data. Returning.");
         return getString(plainText);
     }
 }

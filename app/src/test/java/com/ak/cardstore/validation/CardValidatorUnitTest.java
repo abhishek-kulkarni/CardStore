@@ -7,6 +7,7 @@ import com.ak.cardstore.exception.CardValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
+import static com.ak.cardstore.Make.anInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Abhishek
  */
 
-public class CardValidatorTest {
+public class CardValidatorUnitTest {
 
     @Test
     public void testValidateCardNumber_WithNonNumericCardNumber() {
@@ -111,9 +112,19 @@ public class CardValidatorTest {
     }
 
     @Test
-    public void testValidatePin_WithInvalidPinLength() {
+    public void testValidatePin_WithPinLengthLessThanLowerBound() {
         final CardValidator cardValidator = new CardValidator();
-        final String pin = Make.aPinWithInvalidLength();
+        final String pin = String.valueOf(anInt(0, 1000));
+
+        final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
+                () -> cardValidator.validatePin(pin));
+        assertEquals("Pin " + pin + " must be between 4 and 6 digits!", cardValidationException.getMessage());
+    }
+
+    @Test
+    public void testValidatePin_WithPinLengthMoreThanUpperBound() {
+        final CardValidator cardValidator = new CardValidator();
+        final String pin = String.valueOf(anInt(1000000, 10000000));
 
         final CardValidationException cardValidationException = assertThrows(CardValidationException.class,
                 () -> cardValidator.validatePin(pin));

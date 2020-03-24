@@ -1,5 +1,7 @@
 package com.ak.cardstore.configuration;
 
+import android.os.Build;
+
 import com.ak.cardstore.Make;
 import com.ak.cardstore.cipher.symmetric.SymmetricKeyCipher;
 import com.ak.cardstore.dao.FileBasedDataAccessor;
@@ -9,16 +11,21 @@ import com.ak.cardstore.pojo.Wallet;
 import com.ak.cardstore.serialization.Serializer;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -27,27 +34,31 @@ import static org.mockito.Mockito.when;
  * @author Abhishek
  */
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = {Build.VERSION_CODES.O, Build.VERSION_CODES.O_MR1, Build.VERSION_CODES.P})
 public class AppConfigurationManagerUnitTest {
 
     private static final String CONFIGURATION_FILE_NAME = "com.ak.cardstore.wallet.cdb";
 
-    @Mock
     private Serializer<Wallet> mockWalletSerializer;
-
-    @Mock
     private SymmetricKeyCipher mockSymmetricKeyCipher;
-
-    @Mock
     private Serializer<EncryptedConfiguration> mockEncryptedConfigurationSerializer;
-
-    @Mock
     private FileBasedDataAccessor mockFileBasedDataAccessor;
+    private AppConfigurationManager appConfigurationManager;
+
+    @Before
+    public void setup() {
+        this.mockWalletSerializer = mock(Serializer.class);
+        this.mockSymmetricKeyCipher = mock(SymmetricKeyCipher.class);
+        this.mockEncryptedConfigurationSerializer = mock(Serializer.class);
+        this.mockFileBasedDataAccessor = mock(FileBasedDataAccessor.class);
+
+        this.appConfigurationManager = new AppConfigurationManager(this.mockWalletSerializer, this.mockSymmetricKeyCipher,
+                this.mockEncryptedConfigurationSerializer, this.mockFileBasedDataAccessor);
+    }
 
     @Test
     public void testSave() throws IOException {
-        final AppConfigurationManager appConfigurationManager = new AppConfigurationManager(this.mockWalletSerializer, this.mockSymmetricKeyCipher,
-                this.mockEncryptedConfigurationSerializer, this.mockFileBasedDataAccessor);
         final Wallet wallet = Make.aWallet();
         final String password = Make.aString();
 
@@ -65,7 +76,7 @@ public class AppConfigurationManagerUnitTest {
         when(this.mockEncryptedConfigurationSerializer.serialize(encryptedConfiguration)).thenReturn(serializedEncryptedConfiguration);
         doNothing().when(this.mockFileBasedDataAccessor).save(CONFIGURATION_FILE_NAME, serializedEncryptedConfiguration);
 
-        appConfigurationManager.save(wallet, password);
+        this.appConfigurationManager.save(wallet, password);
 
         verify(this.mockWalletSerializer).serialize(wallet);
         verify(this.mockSymmetricKeyCipher).encrypt(serializedWallet, password);
@@ -75,8 +86,6 @@ public class AppConfigurationManagerUnitTest {
 
     @Test
     public void testSave_WithIOException() throws IOException {
-        final AppConfigurationManager appConfigurationManager = new AppConfigurationManager(this.mockWalletSerializer, this.mockSymmetricKeyCipher,
-                this.mockEncryptedConfigurationSerializer, this.mockFileBasedDataAccessor);
         final Wallet wallet = Make.aWallet();
         final String password = Make.aString();
 
@@ -94,10 +103,10 @@ public class AppConfigurationManagerUnitTest {
         when(this.mockEncryptedConfigurationSerializer.serialize(encryptedConfiguration)).thenReturn(serializedEncryptedConfiguration);
         doThrow(IOException.class).when(this.mockFileBasedDataAccessor).save(CONFIGURATION_FILE_NAME, serializedEncryptedConfiguration);
 
-        final ConfigurationManagerException configurationManagerException = Assertions.assertThrows(ConfigurationManagerException.class,
-                () -> appConfigurationManager.save(wallet, password));
-        Assertions.assertEquals("Error saving the configuration file!", configurationManagerException.getMessage());
-        Assertions.assertTrue(configurationManagerException.getCause() instanceof IOException);
+        final ConfigurationManagerException configurationManagerException = assertThrows(ConfigurationManagerException.class,
+                () -> this.appConfigurationManager.save(wallet, password));
+        assertEquals("Error saving the configuration file!", configurationManagerException.getMessage());
+        assertTrue(configurationManagerException.getCause() instanceof IOException);
 
         verify(this.mockWalletSerializer).serialize(wallet);
         verify(this.mockSymmetricKeyCipher).encrypt(serializedWallet, password);
@@ -107,8 +116,6 @@ public class AppConfigurationManagerUnitTest {
 
     @Test
     public void testLoad() throws IOException {
-        final AppConfigurationManager appConfigurationManager = new AppConfigurationManager(this.mockWalletSerializer, this.mockSymmetricKeyCipher,
-                this.mockEncryptedConfigurationSerializer, this.mockFileBasedDataAccessor);
         final Wallet expctedWallet = Make.aWallet();
         final String password = Make.aString();
 
@@ -128,8 +135,8 @@ public class AppConfigurationManagerUnitTest {
         when(this.mockWalletSerializer.deserialize(serializedWallet)).thenReturn(expctedWallet);
 
 
-        final Wallet wallet = appConfigurationManager.load(password);
-        Assertions.assertSame(expctedWallet, wallet);
+        final Wallet wallet = this.appConfigurationManager.load(password);
+        assertSame(expctedWallet, wallet);
 
         verify(this.mockFileBasedDataAccessor).getContents(CONFIGURATION_FILE_NAME);
         verify(this.mockEncryptedConfigurationSerializer).deserialize(serializedEncryptedConfiguration);
@@ -140,16 +147,14 @@ public class AppConfigurationManagerUnitTest {
 
     @Test
     public void testLoad_WithIOException() throws IOException {
-        final AppConfigurationManager appConfigurationManager = new AppConfigurationManager(this.mockWalletSerializer, this.mockSymmetricKeyCipher,
-                this.mockEncryptedConfigurationSerializer, this.mockFileBasedDataAccessor);
         final String password = Make.aString();
 
         when(this.mockFileBasedDataAccessor.getContents(CONFIGURATION_FILE_NAME)).thenThrow(IOException.class);
 
-        final ConfigurationManagerException configurationManagerException = Assertions.assertThrows(ConfigurationManagerException.class,
-                () -> appConfigurationManager.load(password));
-        Assertions.assertEquals("Error reading the configuration file!", configurationManagerException.getMessage());
-        Assertions.assertTrue(configurationManagerException.getCause() instanceof IOException);
+        final ConfigurationManagerException configurationManagerException = assertThrows(ConfigurationManagerException.class,
+                () -> this.appConfigurationManager.load(password));
+        assertEquals("Error reading the configuration file!", configurationManagerException.getMessage());
+        assertTrue(configurationManagerException.getCause() instanceof IOException);
 
         verify(this.mockFileBasedDataAccessor).getContents(CONFIGURATION_FILE_NAME);
         verifyNoInteractions(this.mockEncryptedConfigurationSerializer);

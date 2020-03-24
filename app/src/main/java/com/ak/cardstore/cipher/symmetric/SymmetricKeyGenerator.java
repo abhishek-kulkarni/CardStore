@@ -17,7 +17,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 
 import static com.ak.cardstore.util.LoggerUtil.logError;
 import static com.ak.cardstore.util.StringUtil.toByteArray;
@@ -28,8 +27,9 @@ import static com.ak.cardstore.util.StringUtil.toByteArray;
  * @author Abhishek
  */
 
-@Log4j2
 public class SymmetricKeyGenerator {
+
+    private static final String LOG_TAG = SymmetricKeyGenerator.class.getSimpleName();
 
     public static final String KEY_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES;
     public static final String BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC;
@@ -64,14 +64,14 @@ public class SymmetricKeyGenerator {
         try {
             keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM, provider);
         } catch (final NoSuchAlgorithmException e) {
-            final String errorMessage = logError(log, Optional.of(e), NO_SUCH_ALGORITHM_ERROR, KEY_ALGORITHM);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), NO_SUCH_ALGORITHM_ERROR, KEY_ALGORITHM);
             throw new SymmetricKeyGenerationException(errorMessage, e);
         }
 
         try {
             keyGenerator.init(keyGenParameterSpec, new SecureRandom(toByteArray(password)));
         } catch (final InvalidAlgorithmParameterException e) {
-            final String errorMessage = logError(log, Optional.of(e), INVALID_KEY_GEN_PARAMETER_SPEC_ERROR, keyGenParameterSpec);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), INVALID_KEY_GEN_PARAMETER_SPEC_ERROR, keyGenParameterSpec);
             throw new SymmetricKeyGenerationException(errorMessage, e);
         }
 

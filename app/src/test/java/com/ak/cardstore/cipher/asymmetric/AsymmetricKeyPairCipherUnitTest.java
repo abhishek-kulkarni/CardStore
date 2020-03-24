@@ -1,17 +1,17 @@
 package com.ak.cardstore.cipher.asymmetric;
 
+import android.os.Build;
+
 import com.ak.cardstore.Make;
 import com.ak.cardstore.cipher.CipherOperator;
 import com.ak.cardstore.cipher.CipherRetriever;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -22,32 +22,34 @@ import javax.crypto.Cipher;
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.BLOCK_MODE;
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.ENCRYPTION_PADDING;
 import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.KEY_ALGORITHM;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Abhishek
  */
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Cipher.class)
-@PowerMockIgnore({"javax.script.*", "javax.management.*"})
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = {Build.VERSION_CODES.O, Build.VERSION_CODES.O_MR1, Build.VERSION_CODES.P})
 public class AsymmetricKeyPairCipherUnitTest {
 
     private static final String ASYMMETRIC_KEY_PAIR_CIPHER_TRANSFORMATION = String.format("%s/%s/%s", KEY_ALGORITHM, BLOCK_MODE, ENCRYPTION_PADDING);
     private static final String ASYMMETRIC_KEY_PAIR_ALIAS = "com.ak.cardstore.askp";
 
-    @Mock
     private AsymmetricKeyPairRetriever mockAsymmetricKeyPairRetriever;
-
-    @Mock
     private CipherRetriever mockCipherRetriever;
-
-    @Mock
     private CipherOperator mockCipherOperator;
-
-    @InjectMocks
     private AsymmetricKeyPairCipher asymmetricKeyPairCipher;
+
+    @Before
+    public void setup() {
+        this.mockAsymmetricKeyPairRetriever = mock(AsymmetricKeyPairRetriever.class);
+        this.mockCipherRetriever = mock(CipherRetriever.class);
+        this.mockCipherOperator = mock(CipherOperator.class);
+
+        this.asymmetricKeyPairCipher = new AsymmetricKeyPairCipher(this.mockAsymmetricKeyPairRetriever, this.mockCipherRetriever,
+                this.mockCipherOperator);
+    }
 
     @Test
     public void testEncrypt() {

@@ -1,5 +1,7 @@
 package com.ak.cardstore.cipher;
 
+import android.util.Log;
+
 import com.ak.cardstore.exception.CipherRetrievalException;
 
 import java.security.InvalidAlgorithmParameterException;
@@ -12,8 +14,6 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
-import lombok.extern.log4j.Log4j2;
-
 import static com.ak.cardstore.util.LoggerUtil.logError;
 
 /**
@@ -22,8 +22,9 @@ import static com.ak.cardstore.util.LoggerUtil.logError;
  * @author Abhishek
  */
 
-@Log4j2
 public class CipherRetriever {
+
+    private static final String LOG_TAG = CipherRetriever.class.getSimpleName();
 
     private static final String CIPHER_TRANSFORMATION_ERROR = "Failed to retrieve cipher for transformation %s";
     private static final String INVALID_KEY_ERROR = "Failed to retrieve cipher due to invalid key";
@@ -44,7 +45,7 @@ public class CipherRetriever {
         try {
             cipher = Cipher.getInstance(cipherTransformation);
         } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
-            final String errorMessage = logError(log, Optional.of(e), CIPHER_TRANSFORMATION_ERROR, cipherTransformation);
+            final String errorMessage = logError(LOG_TAG, Optional.of(e), CIPHER_TRANSFORMATION_ERROR, cipherTransformation);
             throw new CipherRetrievalException(errorMessage, e);
         }
 
@@ -55,10 +56,10 @@ public class CipherRetriever {
                 cipher.init(opMode, key);
             }
         } catch (final InvalidKeyException e) {
-            log.error(INVALID_KEY_ERROR);
+            Log.e(LOG_TAG, INVALID_KEY_ERROR);
             throw new CipherRetrievalException(INVALID_KEY_ERROR, e);
         } catch (final InvalidAlgorithmParameterException e) {
-            log.error(INVALID_INITIAL_VECTOR_ERROR, e);
+            Log.e(LOG_TAG, INVALID_INITIAL_VECTOR_ERROR, e);
             throw new CipherRetrievalException(INVALID_INITIAL_VECTOR_ERROR, e);
         }
 

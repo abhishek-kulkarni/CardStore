@@ -6,7 +6,6 @@ import com.ak.cardstore.pojo.User;
 import com.ak.cardstore.serialization.Serializer;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * A class to manage the user configuration.
@@ -14,7 +13,6 @@ import lombok.extern.log4j.Log4j2;
  * @author Abhishek
  */
 
-@Log4j2
 @AllArgsConstructor
 public class UserConfigurationManager {
 

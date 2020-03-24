@@ -1,5 +1,7 @@
 package com.ak.cardstore.cipher.asymmetric;
 
+import android.util.Log;
+
 import com.ak.cardstore.Make;
 import com.ak.cardstore.TestKeyStore;
 import com.ak.cardstore.cipher.KeyStoreRetriever;
@@ -7,6 +9,7 @@ import com.ak.cardstore.exception.AsymmetricKeyPairRetrievalException;
 import com.ak.cardstore.exception.PrivateKeyRetrievalException;
 import com.ak.cardstore.exception.PublicKeyRetrievalException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -33,12 +36,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -46,7 +52,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({AsymmetricKeyPairRetriever.class, KeyStore.class})
+@PrepareForTest({AsymmetricKeyPairRetriever.class, KeyStore.class, Log.class})
 @PowerMockIgnore({"javax.script.*", "javax.management.*"})
 public class AsymmetricKeyPairRetrieverUnitTest {
 
@@ -58,6 +64,12 @@ public class AsymmetricKeyPairRetrieverUnitTest {
 
     @InjectMocks
     private AsymmetricKeyPairRetriever asymmetricKeyPairRetriever;
+
+    @Before
+    public void setupLog() {
+        mockStatic(Log.class);
+        when(Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(0);
+    }
 
     @Test
     public void testRetrievePrivateKey_WithKeystoreContainsAlias()

@@ -1,12 +1,14 @@
 package com.ak.cardstore.cipher;
 
+import android.util.Log;
+
 import com.ak.cardstore.Make;
 import com.ak.cardstore.exception.CipherOperationException;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -18,7 +20,10 @@ import javax.crypto.IllegalBlockSizeException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -26,9 +31,14 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Cipher.class)
-@PowerMockIgnore({"javax.script.*", "javax.management.*"})
+@PrepareForTest({Cipher.class, Log.class})
 public class CipherOperatorUnitTest {
+
+    @Before
+    public void setupLog() {
+        mockStatic(Log.class);
+        when(Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(0);
+    }
 
     @Test
     public void testDoCipherOperation() throws BadPaddingException, IllegalBlockSizeException {
@@ -51,7 +61,6 @@ public class CipherOperatorUnitTest {
 
         final String dataToOperate = Make.aString();
         final String operationErrorMessage = Make.aString();
-        final byte[] expectedOutputText = Make.aString().getBytes(StandardCharsets.UTF_8);
 
         when(mockCipher.doFinal(dataToOperate.getBytes(StandardCharsets.UTF_8))).thenThrow(BadPaddingException.class);
 

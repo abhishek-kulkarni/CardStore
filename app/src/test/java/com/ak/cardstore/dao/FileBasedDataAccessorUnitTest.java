@@ -1,12 +1,14 @@
 package com.ak.cardstore.dao;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ak.cardstore.Make;
 import com.ak.cardstore.context.AppContextProvider;
 import com.ak.cardstore.util.StringUtil;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -20,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -30,9 +34,15 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({FileBasedDataAccessor.class, AppContextProvider.class})
+@PrepareForTest({FileBasedDataAccessor.class, AppContextProvider.class, Log.class})
 @PowerMockIgnore({"javax.script.*", "javax.management.*"})
 public class FileBasedDataAccessorUnitTest {
+
+    @Before
+    public void setupLog() {
+        mockStatic(Log.class);
+        when(Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(0);
+    }
 
     @Test
     public void testSave() throws Exception {

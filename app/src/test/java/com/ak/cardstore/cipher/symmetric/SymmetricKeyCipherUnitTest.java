@@ -1,11 +1,14 @@
 package com.ak.cardstore.cipher.symmetric;
 
+import android.util.Log;
+
 import com.ak.cardstore.Make;
 import com.ak.cardstore.cipher.CipherOperator;
 import com.ak.cardstore.cipher.CipherRetriever;
 import com.ak.cardstore.exception.CipherOperationException;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -32,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -39,7 +43,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Cipher.class)
+@PrepareForTest({Cipher.class, Log.class})
 @PowerMockIgnore({"javax.script.*", "javax.management.*"})
 public class SymmetricKeyCipherUnitTest {
 
@@ -57,6 +61,12 @@ public class SymmetricKeyCipherUnitTest {
 
     @InjectMocks
     private SymmetricKeyCipher symmetricKeyCipher;
+
+    @Before
+    public void setupLog() {
+        mockStatic(Log.class);
+        when(Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(0);
+    }
 
     @Test
     public void testEncrypt_ThrowsUnrecoverableKeyException() throws UnrecoverableKeyException {

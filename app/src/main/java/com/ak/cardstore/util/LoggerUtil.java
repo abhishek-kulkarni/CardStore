@@ -1,6 +1,6 @@
 package com.ak.cardstore.util;
 
-import org.apache.logging.log4j.Logger;
+import android.util.Log;
 
 import java.util.Optional;
 
@@ -15,20 +15,20 @@ public class LoggerUtil {
     /**
      * Constructs, logs and returns the error message.
      *
-     * @param log                {@link Logger} for the logging class
+     * @param tag                tag to identify the class
      * @param optionalCause      cause of the error
      * @param errorMessageFormat {@link String#format(String, Object...)} compatible error message format
      * @param errorMessageArgs   arguments for the error message
      * @return error message
      */
-    public static String logError(final Logger log, final Optional<Throwable> optionalCause, final String errorMessageFormat,
+    public static String logError(final String tag, final Optional<Throwable> optionalCause, final String errorMessageFormat,
                                   final Object... errorMessageArgs) {
         final String errorMessage = String.format(errorMessageFormat, errorMessageArgs);
 
         if (optionalCause.isPresent()) {
-            log.error(errorMessage, optionalCause.get());
+            Log.e(tag, errorMessage, optionalCause.get());
         } else {
-            log.error(errorMessage);
+            Log.e(tag, errorMessage);
         }
 
         return errorMessage;

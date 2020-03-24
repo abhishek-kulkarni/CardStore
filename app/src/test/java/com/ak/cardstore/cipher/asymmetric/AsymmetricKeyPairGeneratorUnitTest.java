@@ -3,6 +3,7 @@ package com.ak.cardstore.cipher.asymmetric;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.util.Log;
 
 import com.ak.cardstore.Make;
 import com.ak.cardstore.exception.AsymmetricKeyPairGenerationException;
@@ -37,6 +38,7 @@ import static com.ak.cardstore.cipher.asymmetric.AsymmetricKeyPairGenerator.USER
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
@@ -51,7 +53,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({AsymmetricKeyPairGenerator.class, X500Principal.class, KeyGenerator.class})
+@PrepareForTest({AsymmetricKeyPairGenerator.class, X500Principal.class, KeyGenerator.class, Log.class})
 @PowerMockIgnore({"javax.script.*", "javax.management.*", "javax.security.*"})
 public class AsymmetricKeyPairGeneratorUnitTest {
 
@@ -100,6 +102,9 @@ public class AsymmetricKeyPairGeneratorUnitTest {
         modifiersField.setInt(sdkIntField, sdkIntField.getModifiers() & ~Modifier.FINAL);
 
         sdkIntField.set(null, android.os.Build.VERSION_CODES.P);
+
+        mockStatic(Log.class);
+        when(Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(0);
     }
 
     @Test

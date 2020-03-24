@@ -47,6 +47,16 @@ public final class Make {
     }
 
     /**
+     * Returns a pseudorandom {@code int} value.
+     *
+     * @return a pseudorandom {@code int} value
+     */
+    public static int anInt() {
+        return ThreadLocalRandom.current()
+                .nextInt();
+    }
+
+    /**
      * Returns a pseudorandom {@link Year}
      *
      * @return a pseudorandom {@link Year}
@@ -177,21 +187,6 @@ public final class Make {
     public static String aValidPin() {
         // Any 4 to 6 digit string
         return String.valueOf(anInt(1000, 1000000));
-    }
-
-    /**
-     * Returns a pin with length less than 4 or greater than 6
-     *
-     * @return a pin with length less than 4 or greater than 6
-     */
-    public static String aPinWithInvalidLength() {
-        if (aBoolean()) {
-            // Any string with 3 or less digits
-            return String.valueOf(anInt(0, 1000));
-        }
-
-        // Any string with 7 or more digits
-        return String.valueOf(anInt(1000000, 10000000));
     }
 
     /**

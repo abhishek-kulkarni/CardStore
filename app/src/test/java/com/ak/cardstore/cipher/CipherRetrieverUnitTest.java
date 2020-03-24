@@ -1,8 +1,11 @@
 package com.ak.cardstore.cipher;
 
+import android.util.Log;
+
 import com.ak.cardstore.Make;
 import com.ak.cardstore.exception.CipherRetrievalException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -26,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
@@ -39,9 +43,15 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Cipher.class)
+@PrepareForTest({Cipher.class, Log.class})
 @PowerMockIgnore({"javax.script.*", "javax.management.*"})
 public class CipherRetrieverUnitTest {
+
+    @Before
+    public void setupLog() {
+        mockStatic(Log.class);
+        when(Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(0);
+    }
 
     @Test
     public void testRetrieve_WithNoSuchAlgorithmException() throws NoSuchPaddingException, NoSuchAlgorithmException {
