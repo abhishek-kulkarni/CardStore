@@ -1,7 +1,6 @@
-package com.ak.cardstore.validation;
+package com.ak.cardstore.util;
 
 import com.ak.cardstore.Make;
-import com.ak.cardstore.util.StringUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;

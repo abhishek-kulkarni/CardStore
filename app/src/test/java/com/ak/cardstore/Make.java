@@ -4,6 +4,7 @@ import com.ak.cardstore.entities.CardProcessor;
 import com.ak.cardstore.entities.CardType;
 import com.ak.cardstore.entities.MonthYear;
 import com.ak.cardstore.pojo.Card;
+import com.ak.cardstore.pojo.EncryptedConfiguration;
 import com.ak.cardstore.pojo.User;
 import com.ak.cardstore.pojo.Wallet;
 import com.google.common.collect.ImmutableSet;
@@ -263,6 +264,18 @@ public final class Make {
     public static User aValidUser() {
         return User.builder()
                 .password("Password123!")
+                .build();
+    }
+
+    /**
+     * Returns an {@link EncryptedConfiguration} with pseudorandom values.
+     *
+     * @return an {@link EncryptedConfiguration} with pseudorandom values
+     */
+    public static EncryptedConfiguration anEncryptedConfiguration() {
+        return EncryptedConfiguration.builder()
+                .serializedAndEncryptedWallet(Make.aBase64String())
+                .initialVector(Make.aBase64String())
                 .build();
     }
 
