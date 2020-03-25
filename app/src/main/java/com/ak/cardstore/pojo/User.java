@@ -1,6 +1,6 @@
 package com.ak.cardstore.pojo;
 
-import com.ak.cardstore.validation.UserValidator;
+import com.ak.cardstore.validation.PasswordValidator;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ public class User {
      */
     public static final class Builder {
 
-        private static final UserValidator USER_VALIDATOR = new UserValidator();
+        private static final PasswordValidator PASSWORD_VALIDATOR = new PasswordValidator();
 
         @NonNull
         private String password;
@@ -46,7 +46,7 @@ public class User {
          * @return builder
          */
         public Builder password(final String password) {
-            USER_VALIDATOR.validatePassword(password);
+            PASSWORD_VALIDATOR.validatePassword(password);
             this.password = password;
             return this;
         }

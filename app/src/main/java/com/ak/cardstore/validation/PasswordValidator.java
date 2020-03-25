@@ -7,12 +7,12 @@ import java.util.regex.Pattern;
 import lombok.NonNull;
 
 /**
- * A utility class to validate the {@link com.ak.cardstore.pojo.User info}
+ * A utility class to validate the {@link com.ak.cardstore.pojo.User} password
  *
  * @author Abhishek
  */
 
-public class UserValidator {
+public class PasswordValidator {
 
     private static final int PASSWORD_MINIMUM_LENGTH = 8;
     private static final Pattern UPPER_CASE_PATTERN = Pattern.compile("[A-Z]");
