@@ -1,11 +1,11 @@
-package com.ak.cardstore.ui.login;
+package com.ak.cardstore.activity.login;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
 
-import com.ak.cardstore.data.LoginDataSource;
-import com.ak.cardstore.data.LoginRepository;
+import com.ak.cardstore.activity.login.data.LoginDataSource;
+import com.ak.cardstore.activity.login.data.LoginRepository;
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.
@@ -16,7 +16,7 @@ public class LoginViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+    public <T extends ViewModel> T create(@NonNull final Class<T> modelClass) {
         if (modelClass.isAssignableFrom(LoginViewModel.class)) {
             return (T) new LoginViewModel(LoginRepository.getInstance(new LoginDataSource()));
         } else {
