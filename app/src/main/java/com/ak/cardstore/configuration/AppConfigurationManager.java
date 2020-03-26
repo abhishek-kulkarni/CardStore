@@ -26,7 +26,7 @@ public class AppConfigurationManager {
 
     private static final String LOG_TAG = AppConfigurationManager.class.getSimpleName();
 
-    private static final String CONFIGURATION_FILE_NAME = "wallet.cdb";
+    private static final String CONFIGURATION_FILE_NAME = "com.ak.cardstore.wallet.cdb";
 
     private static final String CONFIGURATION_SAVE_ERROR = "Error saving the configuration file!";
     private static final String CONFIGURATION_READ_ERROR = "Error reading the configuration file!";

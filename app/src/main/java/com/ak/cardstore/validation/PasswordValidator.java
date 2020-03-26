@@ -1,6 +1,6 @@
 package com.ak.cardstore.validation;
 
-import com.ak.cardstore.exception.UserValidationException;
+import com.ak.cardstore.exception.PasswordValidationException;
 
 import java.util.regex.Pattern;
 
@@ -32,23 +32,23 @@ public class PasswordValidator {
      */
     public void validatePassword(@NonNull final String password) {
         if (password.length() < PASSWORD_MINIMUM_LENGTH) {
-            throw new UserValidationException("Password must be at least 8 characters in length!");
+            throw new PasswordValidationException("Password must be at least 8 characters in length!");
         }
 
         if (!UPPER_CASE_PATTERN.matcher(password).find()) {
-            throw new UserValidationException("Password must contain at least one upper case letter!");
+            throw new PasswordValidationException("Password must contain at least one upper case letter!");
         }
 
         if (!LOWER_CASE_PATTERN.matcher(password).find()) {
-            throw new UserValidationException("Password must contain at least one lower case letter!");
+            throw new PasswordValidationException("Password must contain at least one lower case letter!");
         }
 
         if (!DIGIT_PATTERN.matcher(password).find()) {
-            throw new UserValidationException("Password must contain at least one digit!");
+            throw new PasswordValidationException("Password must contain at least one digit!");
         }
 
         if (!SPECIAL_CHARACTER_PATTERN.matcher(password).find()) {
-            throw new UserValidationException("Password must contain at least one special character!");
+            throw new PasswordValidationException("Password must contain at least one special character!");
         }
     }
 }
