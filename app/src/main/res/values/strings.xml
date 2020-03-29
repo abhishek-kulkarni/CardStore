@@ -15,5 +15,6 @@
 
     <string name="action_sign_in">Log in</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="password_criteria">Password criteria:\n"&#8226; Use 8 or more characters\n&#8226; Use upper and lower case letters (e.g. Aa)\n&#8226; Use a number (e.g. 1234)\n&#8226; Use a symbol (e.g. !@#$)"</string>
 
 </resources>
