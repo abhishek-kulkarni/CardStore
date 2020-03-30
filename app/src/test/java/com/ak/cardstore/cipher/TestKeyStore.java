@@ -1,4 +1,4 @@
-package com.ak.cardstore;
+package com.ak.cardstore.cipher;
 
 import java.security.KeyStore;
 import java.security.KeyStoreSpi;

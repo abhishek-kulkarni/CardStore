@@ -3,7 +3,7 @@ package com.ak.cardstore.cipher.symmetric;
 import android.os.Build;
 
 import com.ak.cardstore.Make;
-import com.ak.cardstore.TestKeyStore;
+import com.ak.cardstore.cipher.TestKeyStore;
 import com.ak.cardstore.cipher.KeyStoreRetriever;
 import com.ak.cardstore.exception.SymmetricKeyRetrievalException;
 

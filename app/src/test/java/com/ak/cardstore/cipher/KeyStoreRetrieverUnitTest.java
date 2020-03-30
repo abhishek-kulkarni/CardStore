@@ -3,7 +3,6 @@ package com.ak.cardstore.cipher;
 import android.util.Log;
 
 import com.ak.cardstore.Make;
-import com.ak.cardstore.TestKeyStore;
 import com.ak.cardstore.exception.KeyStoreRetrievalException;
 
 import org.junit.Before;
