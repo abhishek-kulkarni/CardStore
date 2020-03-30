@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserConfigurationManager {
 
-    private static final String CONFIGURATION_FILE_NAME = "com.ak.cardstore.user.udb";
+    private static final String CONFIGURATION_FILE_NAME = "com.ak.cardstore.user.uc";
     private static final String PREFERENCES_KEY = "Password";
 
     private final Serializer<User> userSerializer;
@@ -51,5 +51,14 @@ public class UserConfigurationManager {
 
         final User user = this.userSerializer.deserialize(serializedUser);
         return user;
+    }
+
+    /**
+     * Checks if the user configuration exists in the system
+     *
+     * @return true if the user configuration exists in the system, false otherwise
+     */
+    public boolean doesUserConfigurationExist() {
+        return this.sharedPreferencesDataAccessor.doesPreferenceExist(CONFIGURATION_FILE_NAME, PREFERENCES_KEY);
     }
 }

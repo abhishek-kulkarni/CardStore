@@ -18,15 +18,29 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.ak.cardstore.R;
+import com.ak.cardstore.app.App;
+import com.ak.cardstore.configuration.UserConfigurationManager;
+
+import javax.inject.Inject;
 
 import lombok.AllArgsConstructor;
 
 public class LoginActivity extends AppCompatActivity {
 
+    @Inject
+    UserConfigurationManager userConfigurationManager;
+
     private LoginViewModel loginViewModel;
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onCreate(final Bundle savedInstanceState) {
+        App.getAppComponent().inject(this);
+
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_login);
         this.loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
@@ -44,14 +58,14 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText.addTextChangedListener(new PasswordEditTextWatcher(passwordEditText));
         passwordEditText.setOnEditorActionListener(new PasswordEditTextActionListener(passwordEditText));
 
-        loginButton.setOnClickListener(new LoginButtonClickListerner(passwordEditText, loadingProgressBar));
+        loginButton.setOnClickListener(new LoginButtonClickListener(passwordEditText, loadingProgressBar));
     }
 
     /**
      * A class to take an action on the login button click
      */
     @AllArgsConstructor
-    private final class LoginButtonClickListerner implements View.OnClickListener {
+    private final class LoginButtonClickListener implements View.OnClickListener {
 
         private final EditText passwordEditText;
         private final ProgressBar loadingProgressBar;

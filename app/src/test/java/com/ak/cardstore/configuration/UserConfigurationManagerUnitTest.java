@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UserConfigurationManagerUnitTest {
 
-    private static final String CONFIGURATION_FILE_NAME = "com.ak.cardstore.user.udb";
+    private static final String CONFIGURATION_FILE_NAME = "com.ak.cardstore.user.uc";
     private static final String PREFERENCES_KEY = "Password";
 
     @Mock
@@ -74,5 +74,18 @@ public class UserConfigurationManagerUnitTest {
         verify(this.mockSharedPreferencesDataAccessor).get(CONFIGURATION_FILE_NAME, PREFERENCES_KEY);
         verify(this.mockAsymmetricKeyPairCipher).decrypt(encryptedSerializedUser);
         verify(this.mockUserSerializer).deserialize(serializedUser);
+    }
+
+    @Test
+    public void testDoesUserConfigurationExist() {
+        final boolean expectedDoesUserConfigurationExist = Make.aBoolean();
+
+        when(this.mockSharedPreferencesDataAccessor.doesPreferenceExist(CONFIGURATION_FILE_NAME, PREFERENCES_KEY))
+                .thenReturn(expectedDoesUserConfigurationExist);
+
+        final boolean doesUserConfigurationExist = this.userConfigurationManager.doesUserConfigurationExist();
+        Assertions.assertSame(expectedDoesUserConfigurationExist, doesUserConfigurationExist);
+
+        verify(this.mockSharedPreferencesDataAccessor).doesPreferenceExist(CONFIGURATION_FILE_NAME, PREFERENCES_KEY);
     }
 }

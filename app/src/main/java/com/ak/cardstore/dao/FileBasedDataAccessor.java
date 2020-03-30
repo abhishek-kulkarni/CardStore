@@ -3,7 +3,7 @@ package com.ak.cardstore.dao;
 import android.content.Context;
 import android.util.Log;
 
-import com.ak.cardstore.context.AppContextProvider;
+import com.ak.cardstore.app.App;
 import com.ak.cardstore.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -30,7 +30,7 @@ public class FileBasedDataAccessor {
      * @param dataToSave data to be saved to the file
      */
     public void save(final String fileName, final String dataToSave) throws IOException {
-        final Context appContext = AppContextProvider.getAppContext();
+        final Context appContext = App.getAppContext();
 
         try (final FileOutputStream fileOutputStream = appContext.openFileOutput(fileName, Context.MODE_PRIVATE)) {
             fileOutputStream.write(StringUtil.toUTF8ByteArray(dataToSave));
@@ -45,7 +45,7 @@ public class FileBasedDataAccessor {
      * @return file contents
      */
     public String getContents(final String fileName) throws IOException {
-        final Context appContext = AppContextProvider.getAppContext();
+        final Context appContext = App.getAppContext();
 
         final StringBuilder stringBuilder = new StringBuilder();
 

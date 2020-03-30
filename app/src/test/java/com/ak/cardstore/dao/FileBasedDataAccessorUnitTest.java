@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ak.cardstore.Make;
-import com.ak.cardstore.context.AppContextProvider;
+import com.ak.cardstore.app.App;
 import com.ak.cardstore.util.StringUtil;
 
 import org.junit.Assert;
@@ -34,7 +34,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({FileBasedDataAccessor.class, AppContextProvider.class, Log.class})
+@PrepareForTest({FileBasedDataAccessor.class, App.class, Log.class})
 @PowerMockIgnore({"javax.script.*", "javax.management.*"})
 public class FileBasedDataAccessorUnitTest {
 
@@ -52,16 +52,16 @@ public class FileBasedDataAccessorUnitTest {
         final Context mockAppContext = mock(Context.class);
         final FileOutputStream mockFileOutputStream = mock(FileOutputStream.class);
 
-        mockStatic(AppContextProvider.class);
-        when(AppContextProvider.getAppContext()).thenReturn(mockAppContext);
+        mockStatic(App.class);
+        when(App.getAppContext()).thenReturn(mockAppContext);
         when(mockAppContext.openFileOutput(fileName, Context.MODE_PRIVATE)).thenReturn(mockFileOutputStream);
         doNothing().when(mockFileOutputStream).write(StringUtil.toUTF8ByteArray(dataToSave));
 
         final FileBasedDataAccessor fileBasedDataAccessor = new FileBasedDataAccessor();
         fileBasedDataAccessor.save(fileName, dataToSave);
 
-        verifyStatic(AppContextProvider.class);
-        AppContextProvider.getAppContext();
+        verifyStatic(App.class);
+        App.getAppContext();
         verify(mockAppContext).openFileOutput(fileName, Context.MODE_PRIVATE);
         verify(mockFileOutputStream).write(StringUtil.toUTF8ByteArray(dataToSave));
     }
@@ -80,8 +80,8 @@ public class FileBasedDataAccessorUnitTest {
         final FileInputStream mockFileInputStream = mock(FileInputStream.class);
         final BufferedReader mockBufferedReader = mock(BufferedReader.class);
 
-        mockStatic(AppContextProvider.class);
-        when(AppContextProvider.getAppContext()).thenReturn(mockAppContext);
+        mockStatic(App.class);
+        when(App.getAppContext()).thenReturn(mockAppContext);
         when(mockAppContext.openFileInput(fileName)).thenReturn(mockFileInputStream);
         whenNew(InputStreamReader.class).withArguments(mockFileInputStream, StandardCharsets.UTF_8).thenReturn(testInputStreamReader);
         when(mockBufferedReader.readLine()).thenReturn(null);
@@ -90,8 +90,8 @@ public class FileBasedDataAccessorUnitTest {
         final String fileContents = fileBasedDataAccessor.getContents(fileName);
         Assert.assertEquals(expectedFileContents, fileContents);
 
-        verifyStatic(AppContextProvider.class);
-        AppContextProvider.getAppContext();
+        verifyStatic(App.class);
+        App.getAppContext();
         verify(mockAppContext).openFileInput(fileName);
         verifyNew(InputStreamReader.class).withArguments(mockFileInputStream, StandardCharsets.UTF_8);
     }

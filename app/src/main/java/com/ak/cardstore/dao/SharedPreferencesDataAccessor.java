@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.ak.cardstore.context.AppContextProvider;
+import com.ak.cardstore.app.App;
 import com.ak.cardstore.exception.SharedPreferencesIOException;
 import com.ak.cardstore.util.LoggerUtil;
 
@@ -32,7 +32,7 @@ public class SharedPreferencesDataAccessor {
      * @param preferencesValue    value to save
      */
     public void save(@NonNull final String preferencesFileName, @NonNull final String preferencesKey, @NonNull final String preferencesValue) {
-        final Context appContext = AppContextProvider.getAppContext();
+        final Context appContext = App.getAppContext();
 
         final SharedPreferences sharedPreferences = appContext.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
 
@@ -55,11 +55,29 @@ public class SharedPreferencesDataAccessor {
      * @return preferencesValue for a given preferencesKey
      */
     public String get(@NonNull final String preferencesFileName, @NonNull final String preferencesKey) {
-        final Context appContext = AppContextProvider.getAppContext();
+        final Context appContext = App.getAppContext();
 
         final SharedPreferences sharedPreferences = appContext.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
 
         final String preferencesValue = sharedPreferences.getString(preferencesKey, null);
         return preferencesValue;
+    }
+
+    /**
+     * Checks if the shared preference specified by the preferencesKey already exists in the file preferencesFileName
+     *
+     * @param preferencesFileName shared preferences file name
+     * @param preferencesKey      key for which the value is returned
+     * @return true if the shared preference already exists, false otherwise
+     */
+    public boolean doesPreferenceExist(@NonNull final String preferencesFileName, @NonNull final String preferencesKey) {
+        final Context appContext = App.getAppContext();
+
+        final SharedPreferences sharedPreferences = appContext.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
+
+        final String preferencesValue = sharedPreferences.getString(preferencesKey, null);
+
+        final boolean preferenceExists = (preferencesValue != null);
+        return preferenceExists;
     }
 }

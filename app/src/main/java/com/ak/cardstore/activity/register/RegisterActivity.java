@@ -9,13 +9,22 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ak.cardstore.R;
+import com.ak.cardstore.app.App;
+import com.ak.cardstore.configuration.UserConfigurationManager;
+
+import javax.inject.Inject;
 
 import lombok.AllArgsConstructor;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    @Inject
+    UserConfigurationManager userConfigurationManager;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        App.getAppComponent().inject(this);
+
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_register);
 

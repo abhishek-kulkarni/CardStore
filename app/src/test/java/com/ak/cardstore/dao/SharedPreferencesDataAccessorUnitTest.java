@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.ak.cardstore.Make;
-import com.ak.cardstore.context.AppContextProvider;
+import com.ak.cardstore.app.App;
 import com.ak.cardstore.exception.SharedPreferencesIOException;
 
 import org.junit.Assert;
@@ -29,7 +29,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({AppContextProvider.class, Log.class})
+@PrepareForTest({App.class, Log.class})
 @PowerMockIgnore({"javax.script.*", "javax.management.*"})
 public class SharedPreferencesDataAccessorUnitTest {
 
@@ -49,8 +49,8 @@ public class SharedPreferencesDataAccessorUnitTest {
         final SharedPreferences mockSharedPreferences = mock(SharedPreferences.class);
         final SharedPreferences.Editor mockSharedPreferencesEditor = mock(SharedPreferences.Editor.class);
 
-        mockStatic(AppContextProvider.class);
-        when(AppContextProvider.getAppContext()).thenReturn(mockAppContext);
+        mockStatic(App.class);
+        when(App.getAppContext()).thenReturn(mockAppContext);
         when(mockAppContext.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE)).thenReturn(mockSharedPreferences);
         when(mockSharedPreferences.edit()).thenReturn(mockSharedPreferencesEditor);
         when(mockSharedPreferencesEditor.putString(preferencesKey, preferencesValue)).thenReturn(mockSharedPreferencesEditor);
@@ -59,8 +59,8 @@ public class SharedPreferencesDataAccessorUnitTest {
         final SharedPreferencesDataAccessor sharedPreferencesDataAccessor = new SharedPreferencesDataAccessor();
         sharedPreferencesDataAccessor.save(preferencesFileName, preferencesKey, preferencesValue);
 
-        verifyStatic(AppContextProvider.class);
-        AppContextProvider.getAppContext();
+        verifyStatic(App.class);
+        App.getAppContext();
         verify(mockAppContext).getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
         verify(mockSharedPreferences).edit();
         verify(mockSharedPreferencesEditor).putString(preferencesKey, preferencesValue);
@@ -77,8 +77,8 @@ public class SharedPreferencesDataAccessorUnitTest {
         final SharedPreferences mockSharedPreferences = mock(SharedPreferences.class);
         final SharedPreferences.Editor mockSharedPreferencesEditor = mock(SharedPreferences.Editor.class);
 
-        mockStatic(AppContextProvider.class);
-        when(AppContextProvider.getAppContext()).thenReturn(mockAppContext);
+        mockStatic(App.class);
+        when(App.getAppContext()).thenReturn(mockAppContext);
         when(mockAppContext.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE)).thenReturn(mockSharedPreferences);
         when(mockSharedPreferences.edit()).thenReturn(mockSharedPreferencesEditor);
         when(mockSharedPreferencesEditor.putString(preferencesKey, preferencesValue)).thenReturn(mockSharedPreferencesEditor);
@@ -89,8 +89,8 @@ public class SharedPreferencesDataAccessorUnitTest {
                 () -> sharedPreferencesDataAccessor.save(preferencesFileName, preferencesKey, preferencesValue));
         Assert.assertEquals("Error saving shared preferences file " + preferencesFileName, sharedPreferencesIOException.getMessage());
 
-        verifyStatic(AppContextProvider.class);
-        AppContextProvider.getAppContext();
+        verifyStatic(App.class);
+        App.getAppContext();
         verify(mockAppContext).getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
         verify(mockSharedPreferences).edit();
         verify(mockSharedPreferencesEditor).putString(preferencesKey, preferencesValue);
@@ -107,8 +107,8 @@ public class SharedPreferencesDataAccessorUnitTest {
         final SharedPreferences mockSharedPreferences = mock(SharedPreferences.class);
         final SharedPreferences.Editor mockSharedPreferencesEditor = mock(SharedPreferences.Editor.class);
 
-        mockStatic(AppContextProvider.class);
-        when(AppContextProvider.getAppContext()).thenReturn(mockAppContext);
+        mockStatic(App.class);
+        when(App.getAppContext()).thenReturn(mockAppContext);
         when(mockAppContext.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE)).thenReturn(mockSharedPreferences);
         when(mockSharedPreferences.getString(preferencesKey, null)).thenReturn(expectedPreferencesValue);
 
@@ -116,8 +116,32 @@ public class SharedPreferencesDataAccessorUnitTest {
         final String preferencesValue = sharedPreferencesDataAccessor.get(preferencesFileName, preferencesKey);
         Assert.assertSame(expectedPreferencesValue, preferencesValue);
 
-        verifyStatic(AppContextProvider.class);
-        AppContextProvider.getAppContext();
+        verifyStatic(App.class);
+        App.getAppContext();
+        verify(mockAppContext).getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
+        verify(mockSharedPreferences).getString(preferencesKey, null);
+    }
+
+    @Test
+    public void testDoesPreferenceExist_True() {
+        final String preferencesFileName = Make.aString();
+        final String preferencesKey = Make.aString();
+
+        final Context mockAppContext = mock(Context.class);
+        final SharedPreferences mockSharedPreferences = mock(SharedPreferences.class);
+        final SharedPreferences.Editor mockSharedPreferencesEditor = mock(SharedPreferences.Editor.class);
+
+        mockStatic(App.class);
+        when(App.getAppContext()).thenReturn(mockAppContext);
+        when(mockAppContext.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE)).thenReturn(mockSharedPreferences);
+        when(mockSharedPreferences.getString(preferencesKey, null)).thenReturn(Make.aString());
+
+        final SharedPreferencesDataAccessor sharedPreferencesDataAccessor = new SharedPreferencesDataAccessor();
+        final boolean doesPreferenceExist = sharedPreferencesDataAccessor.doesPreferenceExist(preferencesFileName, preferencesKey);
+        Assert.assertTrue(doesPreferenceExist);
+
+        verifyStatic(App.class);
+        App.getAppContext();
         verify(mockAppContext).getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
         verify(mockSharedPreferences).getString(preferencesKey, null);
     }
