@@ -34,7 +34,7 @@ public class AsymmetricKeyPairGenerator {
     public static final String BLOCK_MODE = KeyProperties.BLOCK_MODE_ECB;
     public static final String ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1;
 
-    public static final String CERTIFICATE_NAME_FORMAT = "%s CA Certificate";
+    public static final String CERTIFICATE_NAME_FORMAT = "CN=%s CA Certificate,O=CardStore,C=US";
 
     @VisibleForTesting
     static final int USER_AUTHENTICATION_VALIDITY_DURATION_SECONDS = 30;

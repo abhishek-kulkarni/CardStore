@@ -74,7 +74,7 @@ public class AsymmetricKeyPairGeneratorUnitTest {
                 .withArguments(KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 .thenReturn(this.mockKeyGenParameterSpecBuilder);
         whenNew(X500Principal.class)
-                .withArguments(KEY_ALIAS + " CA Certificate")
+                .withArguments(String.format("CN=%s CA Certificate,O=CardStore,C=US", KEY_ALIAS))
                 .thenReturn(this.mockX500Principal);
 
         when(this.mockKeyGenParameterSpecBuilder.setCertificateSubject(this.mockX500Principal))

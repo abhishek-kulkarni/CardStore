@@ -3,6 +3,7 @@ package com.ak.cardstore.app.component;
 import com.ak.cardstore.activity.login.LoginActivity;
 import com.ak.cardstore.activity.register.RegisterActivity;
 import com.ak.cardstore.dagger.ConfigurationModule;
+import com.ak.cardstore.dagger.ValidationModule;
 
 import javax.inject.Singleton;
 
@@ -15,7 +16,8 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = ConfigurationModule.class)
+@Component(modules = {ConfigurationModule.class,
+        ValidationModule.class})
 public interface AppComponent {
 
     /**
